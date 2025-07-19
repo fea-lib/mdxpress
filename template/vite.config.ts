@@ -5,6 +5,7 @@ import { resolve } from "path";
 import { readFileSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
+import rehypeHighlight from "rehype-highlight";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -26,6 +27,7 @@ export default defineConfig({
       providerImportSource: "@mdx-js/react",
       development: true,
       include: /\.(mdx?|md)$/,
+      rehypePlugins: [rehypeHighlight],
     }),
   ],
   resolve: {

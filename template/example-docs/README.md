@@ -38,21 +38,15 @@ npm run preview
 
 ## Writing Documentation
 
-1. Create `.mdx` files in your `docs` directory
-2. Add frontmatter with a title:
-   ```mdx
-   ---
-   title: Your Page Title
-   ---
-   ```
-3. Write your content using Markdown and React components
-4. Use the `Sandpack` component for interactive code examples
+1. Create `.md` or `.mdx` files in your `docs` directory
+2. Write your content using Markdown and React components
+3. Use the `CodePlayground` component for interactive code examples
 
 ## Interactive Code Examples
 
 Import Sandpack and use it to create interactive code examples:
 
-```mdx
+```jsx
 import { Sandpack } from '@codesandbox/sandpack-react'
 
 <Sandpack
