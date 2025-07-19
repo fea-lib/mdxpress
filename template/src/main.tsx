@@ -8,6 +8,7 @@ import "./index.css";
 
 const components = {
   pre: CodePlayground,
+  CodePlayground,
   // Add other custom components here
 };
 

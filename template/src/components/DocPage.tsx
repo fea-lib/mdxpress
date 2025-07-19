@@ -1,5 +1,5 @@
 import React from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { getDocumentBySlug } from "../lib/docs";
 
 interface Document {
@@ -14,7 +14,10 @@ interface DocPageProps {
 }
 
 export function DocPage({ documents }: DocPageProps) {
-  const { slug } = useParams<{ slug: string }>();
+  const location = useLocation();
+
+  // Extract slug from pathname, removing the /docs/ prefix
+  const slug = location.pathname.replace(/^\/docs\//, "");
 
   if (!slug) {
     return <div>Document not found</div>;

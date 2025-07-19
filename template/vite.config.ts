@@ -25,6 +25,7 @@ export default defineConfig({
       jsxImportSource: "react",
       providerImportSource: "@mdx-js/react",
       development: true,
+      include: /\.(mdx?|md)$/,
     }),
   ],
   resolve: {

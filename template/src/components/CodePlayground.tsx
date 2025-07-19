@@ -2,15 +2,43 @@ import React from "react";
 import { Sandpack } from "@codesandbox/sandpack-react";
 
 interface CodePlaygroundProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   className?: string;
+  template?: string;
+  files?: Record<string, string>;
+  options?: any;
 }
 
 export function CodePlayground({
   children,
   className,
+  template = "react-ts",
+  files,
+  options = {},
   ...props
 }: CodePlaygroundProps) {
+  // If files prop is provided, use Sandpack directly (for MDX usage)
+  if (files) {
+    return (
+      <div className="code-playground">
+        <Sandpack
+          template={template as any}
+          files={files}
+          options={{
+            showNavigator: false,
+            showTabs: true,
+            showLineNumbers: true,
+            showInlineErrors: true,
+            wrapContent: true,
+            editorHeight: 350,
+            ...options,
+          }}
+          theme="light"
+        />
+      </div>
+    );
+  }
+
   // Check if this is a code block that should be interactive
   const isInteractive =
     className?.includes("language-tsx") || className?.includes("language-ts");

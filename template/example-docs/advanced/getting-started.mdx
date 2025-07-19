@@ -1,0 +1,87 @@
+# Getting Started
+
+Welcome to your interactive documentation! This system allows you to create engaging documentation with live code examples.
+
+## Features
+
+- **Interactive Code**: Execute TypeScript/JavaScript code directly in your documentation
+- **MDX Support**: Write documentation in MDX format, combining Markdown with React components
+- **Customizable**: Full control over styling and functionality
+- **Git-Friendly**: Text-based format that works well with version control
+
+## Interactive Code Example
+
+Here's a simple React component example:
+
+<CodePlayground
+  template="react-ts"
+  files={{
+    "/App.tsx": `export default function App() {
+  return (
+    <div style={{ 
+      padding: '20px', 
+      textAlign: 'center',
+      backgroundColor: '#f0f8ff',
+      borderRadius: '8px'
+    }}>
+      <h1>Hello Interactive Docs! 🚀</h1>
+      <p>This code is running live in your documentation!</p>
+    </div>
+  )
+}`
+  }}
+  options={{
+    showNavigator: false,
+    showTabs: false,
+    showLineNumbers: true,
+    editorHeight: 300
+  }}
+/>
+
+## Adding Your Own Documents
+
+1. Create `.mdx` files in your docs directory
+2. Add frontmatter with a title
+3. Write your content using Markdown and React components
+4. Use the `CodePlayground` component for interactive code examples
+
+## TypeScript Example
+
+<CodePlayground
+  template="vanilla-ts"
+  files={{
+    "/index.ts": `interface User {
+  name: string
+  age: number
+  email: string
+}
+
+const users: User[] = [
+  { name: "Alice", age: 30, email: "alice@example.com" },
+  { name: "Bob", age: 25, email: "bob@example.com" }
+]
+
+function getUsersByAge(users: User[], minAge: number): User[] {
+  return users.filter(user => user.age >= minAge)
+}
+
+const adults = getUsersByAge(users, 18)
+console.log("Adults:", adults)
+
+// Output the result to the page
+document.body.innerHTML = \`
+  <h2>Users (18+)</h2>
+  <ul>
+    \${adults.map(user => \`<li>\${user.name} (\${user.age})</li>\`).join('')}
+  </ul>
+\``
+  }}
+  options={{
+    showNavigator: false,
+    showTabs: false,
+    showLineNumbers: true,
+    editorHeight: 400
+  }}
+/>
+
+Happy documenting! 📝

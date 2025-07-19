@@ -9,16 +9,12 @@ interface Document {
 
 // This function will be dynamically populated by the CLI
 export function getDocuments(): Document[] {
-  // Import all MDX files from the docs directory (parent of docs-app)
-  const modules = import.meta.glob("@/docs/**/*.mdx", { eager: true });
+  // Import all MDX and MD files from the docs directory (parent of docs-app)
+  const modules = import.meta.glob("@/docs/**/*.{md,mdx}", { eager: true });
   const docsDir = "docs"; // Always use "docs" for the local directory name
   const documents: Document[] = [];
 
-  console.log("Loading documents from:", modules);
-
   for (const [path, module] of Object.entries(modules)) {
-    console.log("Importing module:", path, module);
-
     // Check if this file is from the configured docs directory
     const pathSegments = path.split("/");
     const docsDirIndex = pathSegments.findIndex(
@@ -33,21 +29,22 @@ export function getDocuments(): Document[] {
     const slugParts = pathSegments.slice(docsDirIndex + 1);
     const slug = slugParts
       .join("/")
-      .replace(".mdx", "")
+      .replace(/\.(mdx?|md)$/, "")
       .replace(/\/index$/, "");
 
     if (!slug) continue;
 
-    // Extract title from the component or use slug as fallback
+    // Extract title from the component, use original filename with extension, or slug as fallback
+    const originalFileName = pathSegments[pathSegments.length - 1];
     const title =
       (module as any).frontmatter?.title ||
+      originalFileName ||
       slug.split("/").pop()?.replace(/-/g, " ") ||
       slug;
 
     // Ensure we have a valid React component
     const Component = (module as any).default;
     if (!Component || typeof Component !== "function") {
-      console.error("Invalid component for", path, module);
       continue;
     }
 
@@ -55,7 +52,7 @@ export function getDocuments(): Document[] {
       slug,
       title,
       path,
-      Component: (module as any).default,
+      Component,
     });
   }
 
