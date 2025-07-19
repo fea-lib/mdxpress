@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { ThemeToggle } from "./ThemeToggle";
 
 interface Document {
   slug: string;
@@ -171,12 +172,13 @@ export function Navigation({ documents }: NavigationProps) {
       )}
 
       <nav className={`navigation ${isMobileMenuOpen ? "mobile-open" : ""}`}>
-        <div className="nav-header">
+        <div className="navigation-header">
           <h1>
             <Link to="/" style={{ color: "inherit", textDecoration: "none" }}>
               {config.docsDir}
             </Link>
           </h1>
+          <ThemeToggle />
         </div>
 
         <div className="nav-content">

@@ -1,5 +1,6 @@
 import React from "react";
 import { Sandpack } from "@codesandbox/sandpack-react";
+import { useTheme } from "../contexts/ThemeContext";
 
 interface CodePlaygroundProps {
   children?: React.ReactNode;
@@ -17,6 +18,11 @@ export function CodePlayground({
   options = {},
   ...props
 }: CodePlaygroundProps) {
+  const { theme } = useTheme();
+
+  // Determine Sandpack theme based on current theme
+  const sandpackTheme = theme === "dark" ? "dark" : "light";
+
   // If files prop is provided, use Sandpack directly (for MDX usage)
   if (files) {
     return (
@@ -33,7 +39,7 @@ export function CodePlayground({
             editorHeight: 350,
             ...options,
           }}
-          theme="light"
+          theme={sandpackTheme}
         />
       </div>
     );
@@ -79,7 +85,7 @@ export function CodePlayground({
           wrapContent: true,
           editorHeight: 350,
         }}
-        theme="light"
+        theme={sandpackTheme}
       />
     </div>
   );

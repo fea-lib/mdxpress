@@ -17,6 +17,28 @@
   --link-hover: #0550ae;
 }
 
+/* Dark mode variables - GitHub Dark Theme */
+[data-theme="dark"] {
+  --primary-color: #58a6ff;
+  --secondary-color: #21262d;
+  --bg-color: #0d1117;
+  --text-color: #e6edf3;
+  --text-color-secondary: #7d8590;
+  --text-color-light: #7d8590;
+  --border-color: #30363d;
+  --hover-bg: #21262d;
+  --active-color: #58a6ff;
+  --code-bg: #161b22;
+  --pre-bg: #161b22;
+  --link-color: #58a6ff;
+  --link-hover: #79c0ff;
+}
+
+/* Ensure smooth transitions between themes */
+* {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -279,7 +301,7 @@ body {
 .home-page p {
   font-size: 1.2rem;
   margin-bottom: 2rem;
-  color: #666;
+  color: var(--text-color-secondary);
 }
 
 .home-page .features {
@@ -302,7 +324,7 @@ body {
 }
 
 .feature p {
-  color: #666;
+  color: var(--text-color-secondary);
   margin-bottom: 0;
 }
 
@@ -310,6 +332,8 @@ body {
 .nav-header {
   margin: 0;
 }
+
+/* Use navigation-header for the new header with theme toggle */
 
 /* Mobile menu toggle button (burger menu) - hidden by default, only shown on tablet and smaller */
 .mobile-menu-toggle {
@@ -505,12 +529,13 @@ body {
     flex-direction: column;
   }
   
-  .navigation .nav-header {
-    display: block;
+  .navigation .navigation-header {
+    display: flex;
     margin-bottom: 0;
+    padding: 12px 16px;
   }
   
-  .navigation .nav-header h1 {
+  .navigation .navigation-header h1 {
     font-size: 16px;
     font-weight: 600;
   }
@@ -569,14 +594,16 @@ body {
   }
   
   /* Navigation header in mobile overlay */
-  .navigation.mobile-open .nav-header {
+  .navigation.mobile-open .navigation-header {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     margin-bottom: 0;
+    padding: 0 0 16px 0;
+    border-bottom: 1px solid var(--border-color);
   }
 
-  .navigation.mobile-open .nav-header h1 {
+  .navigation.mobile-open .navigation-header h1 {
     font-size: 18px;
     margin: 0;
   }
@@ -683,4 +710,54 @@ body {
   opacity: 1;
   visibility: visible;
   display: block;
+}
+
+/* Theme Toggle Styles */
+.theme-toggle {
+  background: none;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-color);
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  min-width: 32px;
+  height: 32px;
+}
+
+.theme-toggle:hover {
+  background-color: var(--hover-bg);
+  border-color: var(--text-color-secondary);
+}
+
+.theme-toggle:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.theme-toggle svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s ease;
+}
+
+.theme-toggle:hover svg {
+  transform: scale(1.1);
+}
+
+/* Navigation header with theme toggle */
+.navigation-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.navigation-header h1 {
+  margin: 0;
+  padding: 0;
 }
