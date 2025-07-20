@@ -2,6 +2,25 @@
 
 All notable changes to MDXpress will be documented in this file.
 
+## [1.2.0] - 2025-07-20
+
+### Added
+- **GitHub Pages Deployment**: Automated deployment to GitHub Pages on push to main branch
+  - Complete CI/CD pipeline with GitHub Actions
+  - Automatic symlink resolution during build process
+  - SPA routing support with 404.html fallback
+  - Live demo available at: https://fea-lib.github.io/mdxpress
+
+### Fixed
+- **MDX Production Compilation**: Resolved JavaScript runtime errors in production builds
+  - Fixed MDX plugin configuration for production environments
+  - Added proper JSX runtime configuration (`jsxRuntime: "automatic"`)
+  - Conditional development mode setting based on NODE_ENV
+- **Direct URL Access**: Fixed 404 errors when refreshing or directly accessing document URLs
+  - Added 404.html that serves the React app for any missing route
+  - Enables bookmarking and sharing of direct document links
+  - Maintains proper base path handling for GitHub Pages deployment
+
 ## [1.1.1] - 2025-07-20
 
 ### Changed
