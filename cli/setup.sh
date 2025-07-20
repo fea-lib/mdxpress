@@ -28,9 +28,9 @@ REPO_URL="https://github.com/fea-lib/mdxpress/archive/refs/heads/main.tar.gz"
 
 # Check if we're running locally (for development)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-if [ -f "$SCRIPT_DIR/../template/package.json" ]; then
+if [ -f "$SCRIPT_DIR/../app-template/package.json" ]; then
     LOCAL_MODE=true
-    TEMPLATE_PATH="$SCRIPT_DIR/../template"
+    TEMPLATE_PATH="$SCRIPT_DIR/../app-template"
     echo "🔧 Running in local development mode"
 else
     LOCAL_MODE=false
@@ -83,7 +83,7 @@ case $proceed in
 esac
 
 echo ""
-echo "📦 Downloading template..."
+echo "📦 Downloading app-template..."
 
 # Create temporary directory
 TEMP_DIR=$(mktemp -d)
@@ -93,16 +93,16 @@ cleanup() {
 trap cleanup EXIT
 
 if [ "$LOCAL_MODE" = true ]; then
-    echo "📋 Using local template..."
-    # Copy local template to temp directory
-    cp -r "$TEMPLATE_PATH" "$TEMP_DIR/template"
+    echo "📋 Using local app-template..."
+    # Copy local app-template to temp directory
+    cp -r "$TEMPLATE_PATH" "$TEMP_DIR/app-template"
 else
     # Download and extract
     cd "$TEMP_DIR"
     curl -L "$REPO_URL" | tar xz --strip-components=1
 
-    # Check if template directory exists
-    if [ ! -d "template" ]; then
+    # Check if app-template directory exists
+    if [ ! -d "app-template" ]; then
         echo "❌ Error: Template directory not found in download."
         exit 1
     fi
@@ -110,11 +110,11 @@ fi
 
 echo "✅ Template ready."
 
-# Copy template to target directory
-echo "📋 Copying template to $TARGET_DIR..."
+# Copy app-template to target directory
+echo "📋 Copying app-template to $TARGET_DIR..."
 # Store the original directory and go back to it
 ORIGINAL_DIR=$(pwd)
-cp -r "$TEMP_DIR/template" "$TARGET_DIR"
+cp -r "$TEMP_DIR/app-template" "$TARGET_DIR"
 
 # Update docs configuration
 echo "⚙️  Configuring docs directory..."

@@ -74,7 +74,7 @@ if /i "%proceed%"=="no" (
 )
 
 echo.
-echo 📦 Downloading template...
+echo 📦 Downloading app-template...
 
 REM Create temporary directory
 set TEMP_DIR=%TEMP%\mdxpress_setup_%RANDOM%
@@ -82,22 +82,22 @@ mkdir "%TEMP_DIR%"
 
 REM Download and extract
 cd /d "%TEMP_DIR%"
-curl -L "%REPO_URL%" -o template.tar.gz
+curl -L "%REPO_URL%" -o app-template.tar.gz
 if %errorlevel% neq 0 (
-    echo ❌ Error downloading template.
+    echo ❌ Error downloading app-template.
     pause
     exit /b 1
 )
 
-tar -xzf template.tar.gz --strip-components=1
+tar -xzf app-template.tar.gz --strip-components=1
 if %errorlevel% neq 0 (
     echo ❌ Error extracting template.
     pause
     exit /b 1
 )
 
-REM Check if template directory exists
-if not exist "template" (
+REM Check if app-template directory exists
+if not exist "app-template" (
     echo ❌ Error: Template directory not found in download.
     pause
     exit /b 1
@@ -108,11 +108,11 @@ echo ✅ Template downloaded successfully.
 REM Go back to original directory
 cd /d "%~dp0"
 
-REM Copy template to target directory
-echo 📋 Copying template to %TARGET_DIR%...
-xcopy "%TEMP_DIR%\template" "%TARGET_DIR%\" /E /I /H /Y >nul
+REM Copy app-template to target directory
+echo 📋 Copying app-template to %TARGET_DIR%...
+xcopy "%TEMP_DIR%\app-template" "%TARGET_DIR%\" /E /I /H /Y >nul
 if %errorlevel% neq 0 (
-    echo ❌ Error copying template.
+    echo ❌ Error copying app-template.
     pause
     exit /b 1
 )

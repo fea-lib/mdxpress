@@ -167,9 +167,9 @@ Deploy the `dist` folder to:
 
 ## 🤝 Contributing
 
-This project follows the "copy-in" philosophy. The template is designed to be copied and customized, not updated through a package manager. However, we welcome:
+This project follows the "copy-in" philosophy. The app-template is designed to be copied and customized, not updated through a package manager. However, we welcome:
 
-- Bug reports for the template
+- Bug reports for the app-template
 - Improvements to the CLI scripts
 - New example components
 - Documentation improvements

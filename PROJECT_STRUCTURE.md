@@ -6,11 +6,11 @@ This document outlines the complete structure of the MDXpress project.
 
 ```
 mdxpress/
-├── README.md                 # Main project documentation
-├── LICENSE                   # MIT license
-├── docs/                     # Project documentation (this folder)
+├── README.md                # Main project documentation
+├── LICENSE                  # MIT license
+├── docs/                    # Project documentation (this folder)
 │   └── README.md            # Project overview and planning docs
-├── template/                 # The template that gets copied to users
+├── app-template/            # The app-template that gets copied to users
 │   ├── package.json         # Template dependencies and scripts
 │   ├── vite.config.ts       # Vite configuration with MDX support
 │   ├── tsconfig.json        # TypeScript configuration
@@ -36,9 +36,9 @@ mdxpress/
 │   └── public/              # Static assets
 │       └── vite.svg         # Vite logo
 ├── cli/                     # CLI scripts for setup
-│   ├── setup.sh            # Bash setup script (Linux/macOS)
-│   └── setup.bat           # Batch setup script (Windows)
-└── test-cli.sh             # Test script for CLI functionality
+│   ├── setup.sh             # Bash setup script (Linux/macOS)
+│   └── setup.bat            # Batch setup script (Windows)
+└── test-cli.sh              # Test script for CLI functionality
 ```
 
 ## Template Features
@@ -88,13 +88,13 @@ mdxpress/
 
 ### For Developers
 1. Clone repository for local development
-2. Modify template files as needed
+2. Modify app-template files as needed
 3. Test changes with `test-cli.sh`
 4. Update CLI scripts for new features
 
 ## Extension Points
 
-The template is designed to be fully customizable:
+The app-template is designed to be fully customizable:
 
 - **Styling**: Modify `src/index.css` or add CSS frameworks
 - **Components**: Add custom React components
@@ -106,6 +106,6 @@ The template is designed to be fully customizable:
 
 Following the shadcn/ui model:
 - No npm package to maintain
-- Direct template copying via CLI
+- Direct app-template copying via CLI
 - Users own the complete codebase
 - Zero ongoing dependencies or updates required

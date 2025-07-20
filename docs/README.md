@@ -24,12 +24,12 @@ The motivation was to empower developers to easily enhance their documentation w
   - Framework flexibility (Vite, Astro, Docusaurus, Starlight)
 
 ## 💡 Core Ideas & Features
-- **Copy-in CLI:** Scaffolds the docs app into any target directory, with prompts for docs location. This is not a global npm package, but a local tool or script that copies the template into the user's project, inspired by the shadcn/ui approach.
+- **Copy-in CLI:** Scaffolds the docs app into any target directory, with prompts for docs location. This is not a global npm package, but a local tool or script that copies the app-template into the user's project, inspired by the shadcn/ui approach.
 - **Custom Vite+MDX+React Template:** Lightweight, flexible, and easy to maintain.
 - **Configurable Docs Directory:** User can specify any folder for their markdown/MDX files.
 - **No Lock-in:** Users can fully customize or extend the copied codebase.
 - **Clear Next Steps:** CLI prints instructions for install, dev, and build.
-- **Shell/Batch Script:** A bash or batch script will be provided to download and configure the template interactively.
+- **Shell/Batch Script:** A bash or batch script will be provided to download and configure the app-template interactively.
 - **Text-Based Foundation:** Documents authored in Markdown/MDX format for git compatibility
 - **Human-Readable Source:** Plain text documents readable in any editor
 - **Enhanced Rendering:** Rich styling, syntax highlighting, and media embedding in specialized environments
@@ -68,12 +68,12 @@ The system architecture consists of several layers:
 **CLI Tool:**
 - Shell Script
 - Prompts for target and docs directory
-- Copies template, injects config, handles conflicts
+- Copies app-template, injects config, handles conflicts
 - Prints next steps
 
 **Example File Structure:**
 ```
-template/
+app-template/
   package.json
   vite.config.ts
   src/
@@ -141,9 +141,9 @@ read -p "Enter the target directory [docs-app]: " TARGET_DIR
 TARGET_DIR=${TARGET_DIR:-docs-app}
 read -p "Enter the docs source directory [docs]: " DOCS_DIR
 DOCS_DIR=${DOCS_DIR:-docs}
-# Download and extract template, update config, etc.
+# Download and extract app-template, update config, etc.
 curl -L https://github.com/your-org/your-repo/archive/refs/heads/main.tar.gz | tar xz
-mv your-repo-main/template "$TARGET_DIR"
+mv your-repo-main/app-template "$TARGET_DIR"
 # Here you would update the config file to set docsDir to $DOCS_DIR
 echo "Setup complete! See $TARGET_DIR for your new docs app."
 ```
@@ -155,10 +155,10 @@ set /p TARGET_DIR=Enter the target directory [docs-app]:
 if "%TARGET_DIR%"=="" set TARGET_DIR=docs-app
 set /p DOCS_DIR=Enter the docs source directory [docs]:
 if "%DOCS_DIR%"=="" set DOCS_DIR=docs
-REM Download and extract template (requires curl and tar or use PowerShell Expand-Archive)
-curl -L https://github.com/your-org/your-repo/archive/refs/heads/main.zip -o template.zip
-tar -xf template.zip
-move your-repo-main\template %TARGET_DIR%
+REM Download and extract app-template (requires curl and tar or use PowerShell Expand-Archive)
+curl -L https://github.com/your-org/your-repo/archive/refs/heads/main.zip -o app-template.zip
+tar -xf app-template.zip
+move your-repo-main\app-template %TARGET_DIR%
 REM Here you would update the config file to set docsDir to %DOCS_DIR%
 echo Setup complete! See %TARGET_DIR% for your new docs app.
 ```
@@ -198,7 +198,7 @@ echo Setup complete! See %TARGET_DIR% for your new docs app.
 - **CLI Tool:**
   - Shell Script
   - Prompts for target and docs directory
-  - Copies template, injects config, handles conflicts
+  - Copies app-template, injects config, handles conflicts
   - Prints next steps
 
 ## 📚 References & Inspirations

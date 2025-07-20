@@ -39,5 +39,5 @@ All notable changes to MDXpress will be documented in this file.
 - Batch script for Windows
 - Local development mode detection
 - Interactive setup prompts
-- Automatic template copying and configuration
+- Automatic app-template copying and configuration
 - Clear setup instructions and error handling
