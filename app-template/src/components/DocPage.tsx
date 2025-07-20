@@ -52,9 +52,23 @@ export function DocPage({ documents }: DocPageProps) {
     componentType: typeof Component,
   });
 
-  return (
-    <div className="doc-content">
-      <Component />
-    </div>
-  );
+  try {
+    return (
+      <div className="doc-content">
+        <Component />
+      </div>
+    );
+  } catch (error) {
+    console.error("Error rendering component:", error);
+    return (
+      <div className="doc-content">
+        <h1>Error Loading Document</h1>
+        <p>Failed to load: {document.title}</p>
+        <details>
+          <summary>Error Details</summary>
+          <pre>{String(error)}</pre>
+        </details>
+      </div>
+    );
+  }
 }
