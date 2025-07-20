@@ -26,9 +26,10 @@ export default defineConfig({
     mdx({
       jsxImportSource: "react",
       providerImportSource: "@mdx-js/react",
-      development: true,
+      development: process.env.NODE_ENV !== "production",
       include: /\.(mdx?|md)$/,
       rehypePlugins: [rehypeHighlight],
+      jsxRuntime: "automatic",
     }),
   ],
   resolve: {

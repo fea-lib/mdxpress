@@ -24,15 +24,6 @@ export function DocPage({ documents }: DocPageProps) {
   // Remove empty first element and docs directory
   const slug = pathParts.slice(2).join("/");
 
-  console.log("DocPage debug:", {
-    pathname: location.pathname,
-    baseUrl,
-    relativePath,
-    pathParts,
-    slug,
-    documentsCount: documents.length,
-  });
-
   if (!slug) {
     return <div>Document not found</div>;
   }
@@ -44,13 +35,6 @@ export function DocPage({ documents }: DocPageProps) {
   }
 
   const { Component } = document;
-
-  console.log("About to render component:", {
-    slug: document.slug,
-    title: document.title,
-    Component: Component,
-    componentType: typeof Component,
-  });
 
   try {
     return (
