@@ -34,7 +34,6 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": resolve(__dirname, "./src"),
-      "@docs": resolve(__dirname, `../${docsDir}`),
     },
   },
   optimizeDeps: {

@@ -32,6 +32,18 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
+      - name: Ensure docs symlink works
+        working-directory: ./app-template
+        run: |
+          # Check if the symlink exists and works
+          ls -la src/docs
+          # If it's a symlink, ensure the target exists
+          if [ -L src/docs ]; then
+            target=$(readlink src/docs)
+            echo "Symlink points to: $target"
+            ls -la "$target" || echo "Symlink target not found"
+          fi
+
       - name: Install dependencies
         working-directory: ./app-template
         run: npm install
