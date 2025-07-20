@@ -67,6 +67,12 @@ jobs:
         env:
           NODE_ENV: production
 
+      - name: Create 404.html for GitHub Pages SPA routing
+        working-directory: ./app-template/dist
+        run: |
+          # Copy index.html to 404.html to serve the React app for any missing route
+          cp index.html 404.html
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
