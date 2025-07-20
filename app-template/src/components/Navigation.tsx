@@ -21,12 +21,22 @@ interface TreeNode {
 }
 
 // Read docs configuration
-function getDocsConfig() {
+async function getDocsConfig() {
   try {
-    // In development, we can read from the config file
-    return { docsDir: "docs" }; // Default fallback
+    // Import the config file dynamically
+    const response = await fetch('/docs.config.json');
+    const config = await response.json();
+    return {
+      docsDir: config.docsDir || "docs",
+      title: config.title || "Documentation", 
+      description: config.description || ""
+    };
   } catch {
-    return { docsDir: "docs" };
+    return { 
+      docsDir: "docs",
+      title: "Documentation",
+      description: ""
+    };
   }
 }
 
@@ -121,8 +131,13 @@ function TreeNodeComponent({
 
 export function Navigation({ documents }: NavigationProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [config, setConfig] = useState({ docsDir: "docs", title: "Documentation", description: "" });
   const tree = buildDocumentTree(documents);
-  const config = getDocsConfig();
+
+  // Load configuration
+  useEffect(() => {
+    getDocsConfig().then(setConfig);
+  }, []);
 
   // Close mobile menu when clicking outside or on a link
   useEffect(() => {
