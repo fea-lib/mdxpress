@@ -20,6 +20,7 @@ try {
 }
 
 export default defineConfig({
+  base: process.env.NODE_ENV === "production" ? "/mdxpress/" : "/",
   plugins: [
     react(),
     mdx({
