@@ -75,14 +75,17 @@ function buildDocumentTree(documents: Document[]): TreeNode {
 function TreeNodeComponent({
   node,
   depth = 0,
+  docsDir,
 }: {
   node: TreeNode;
   depth?: number;
+  docsDir: string;
 }) {
   const [isExpanded, setIsExpanded] = useState(depth === 0 || depth === 1);
   const location = useLocation();
   const hasChildren = node.children.length > 0;
-  const isActive = node.slug && location.pathname === `/docs/${node.slug}`;
+  const isActive =
+    node.slug && location.pathname === `/${docsDir}/${node.slug}`;
 
   const toggleExpanded = () => {
     if (hasChildren) {
@@ -107,7 +110,7 @@ function TreeNodeComponent({
           </button>
         ) : (
           // Document node - regular link
-          <Link to={`/docs/${node.slug}`} className="tree-link">
+          <Link to={`/${docsDir}/${node.slug}`} className="tree-link">
             <span className="tree-file-icon"></span>
             {node.title || node.name}
           </Link>
@@ -121,6 +124,7 @@ function TreeNodeComponent({
               key={`${child.name}-${index}`}
               node={child}
               depth={depth + 1}
+              docsDir={docsDir}
             />
           ))}
         </ul>
@@ -207,6 +211,7 @@ export function Navigation({ documents }: NavigationProps) {
                 key={`${child.name}-${index}`}
                 node={child}
                 depth={0}
+                docsDir={config.docsDir}
               />
             ))}
           </ul>
