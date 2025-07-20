@@ -66,10 +66,8 @@ function TreeNodeComponent({
   const location = useLocation();
   const hasChildren = node.children.length > 0;
   // Strip the base URL from pathname for comparison
-  const relativePath = location.pathname.replace(
-    import.meta.env.BASE_URL.replace(/\/$/, ""),
-    ""
-  );
+  const baseUrl = import.meta.env.BASE_URL.replace(/\/$/, "");
+  const relativePath = location.pathname.replace(baseUrl, "");
   const isActive = node.slug && relativePath === `/${docsDir}/${node.slug}`;
 
   const toggleExpanded = () => {
