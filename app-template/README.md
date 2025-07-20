@@ -34,13 +34,13 @@ Download and run the setup script for your platform:
 - 📦 **Zero Lock-in**: Copy the code and make it yours
 - 🌐 **Deploy Anywhere**: Static build works with any hosting provider
 
-## � Live Demo
+## 🚀 Live Demo
 
 Check out the live demo to see MDXpress in action: **[https://fea-lib.github.io/mdxpress](https://fea-lib.github.io/mdxpress)**
 
 The demo showcases all the features including interactive code examples, MDX documentation, and the complete documentation structure.
 
-## �🎯 Perfect For
+## 🎯 Perfect For
 
 - Software project documentation
 - Educational content with live code examples
