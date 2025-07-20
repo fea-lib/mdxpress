@@ -16,9 +16,13 @@ interface DocPageProps {
 export function DocPage({ documents }: DocPageProps) {
   const location = useLocation();
 
-  // Extract slug from pathname, removing the docs directory prefix
-  // The pathname will be like "/my-docs/some-slug" or "/docs/some-slug"
-  const pathParts = location.pathname.split("/");
+  // Extract slug from pathname, removing the base URL and docs directory prefix
+  // First strip the base URL, then extract the slug
+  const relativePath = location.pathname.replace(
+    import.meta.env.BASE_URL.replace(/\/$/, ""),
+    ""
+  );
+  const pathParts = relativePath.split("/");
   // Remove empty first element and docs directory
   const slug = pathParts.slice(2).join("/");
 

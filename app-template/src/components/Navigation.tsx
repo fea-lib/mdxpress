@@ -65,8 +65,12 @@ function TreeNodeComponent({
   const [isExpanded, setIsExpanded] = useState(depth === 0 || depth === 1);
   const location = useLocation();
   const hasChildren = node.children.length > 0;
-  const isActive =
-    node.slug && location.pathname === `/${docsDir}/${node.slug}`;
+  // Strip the base URL from pathname for comparison
+  const relativePath = location.pathname.replace(
+    import.meta.env.BASE_URL.replace(/\/$/, ""),
+    ""
+  );
+  const isActive = node.slug && relativePath === `/${docsDir}/${node.slug}`;
 
   const toggleExpanded = () => {
     if (hasChildren) {
@@ -91,7 +95,7 @@ function TreeNodeComponent({
           </button>
         ) : (
           // Document node - regular link
-          <Link to={`/${docsDir}/${node.slug}`} className="tree-link">
+          <Link to={`${docsDir}/${node.slug}`} className="tree-link">
             <span className="tree-file-icon"></span>
             {node.title || node.name}
           </Link>

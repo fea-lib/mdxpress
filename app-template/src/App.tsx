@@ -27,7 +27,7 @@ function App() {
               element={
                 firstDocument ? (
                   <Navigate
-                    to={`/${config.docsDir}/${firstDocument.slug}`}
+                    to={`${config.docsDir}/${firstDocument.slug}`}
                     replace
                   />
                 ) : (
@@ -36,7 +36,7 @@ function App() {
               }
             />
             <Route
-              path={`/${config.docsDir}/*`}
+              path={`${config.docsDir}/*`}
               element={<DocPage documents={documents} />}
             />
           </Routes>
