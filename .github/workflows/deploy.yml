@@ -32,17 +32,17 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
-      - name: Ensure docs symlink works
+      - name: Debug directory structure
         working-directory: ./app-template
         run: |
-          # Check if the symlink exists and works
-          ls -la src/docs
-          # If it's a symlink, ensure the target exists
-          if [ -L src/docs ]; then
-            target=$(readlink src/docs)
-            echo "Symlink points to: $target"
-            ls -la "$target" || echo "Symlink target not found"
-          fi
+          echo "=== App-template directory structure ==="
+          ls -la
+          echo "=== Checking if example-docs exists ==="
+          ls -la example-docs/ || echo "example-docs directory not found"
+          echo "=== Checking src/docs symlink ==="
+          ls -la src/docs || echo "src/docs symlink not found"
+          echo "=== Testing symlink resolution ==="
+          ls -la src/docs/ || echo "Cannot access through symlink"
 
       - name: Install dependencies
         working-directory: ./app-template
