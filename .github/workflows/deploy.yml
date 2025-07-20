@@ -32,17 +32,30 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
-      - name: Debug directory structure
+      - name: Fix broken symlinks in example-docs
         working-directory: ./app-template
         run: |
-          echo "=== App-template directory structure ==="
+          echo "=== Fixing broken symlinks in example-docs ==="
+          cd example-docs
+          # Remove broken symlinks and copy files from the root repository
+          if [ -L "IDEA.md" ]; then
+            rm IDEA.md
+            cp ../../../docs/IDEA.md IDEA.md || echo "Warning: Could not copy IDEA.md"
+          fi
+          if [ -L "CHANGELOG.md" ]; then
+            rm CHANGELOG.md
+            cp ../CHANGELOG.md CHANGELOG.md
+          fi
+          if [ -L "PROJECT_STRUCTURE.md" ]; then
+            rm PROJECT_STRUCTURE.md
+            cp ../PROJECT_STRUCTURE.md PROJECT_STRUCTURE.md
+          fi
+          if [ -L "README.md" ]; then
+            rm README.md
+            cp ../README.md README.md
+          fi
+          echo "=== Verifying fixed files ==="
           ls -la
-          echo "=== Checking if example-docs exists ==="
-          ls -la example-docs/ || echo "example-docs directory not found"
-          echo "=== Checking src/docs symlink ==="
-          ls -la src/docs || echo "src/docs symlink not found"
-          echo "=== Testing symlink resolution ==="
-          ls -la src/docs/ || echo "Cannot access through symlink"
 
       - name: Install dependencies
         working-directory: ./app-template
