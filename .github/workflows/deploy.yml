@@ -33,6 +33,13 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
+      - name: Debug 1
+        run: ls -la
+
+      - name: Debug 2
+        working-directory: ./app-template
+        run: ls -la
+
       - name: Install dependencies
         working-directory: ./app-template
         run: npm install
