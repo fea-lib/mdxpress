@@ -24,18 +24,18 @@ interface TreeNode {
 async function getDocsConfig() {
   try {
     // Import the config file dynamically
-    const response = await fetch('/docs.config.json');
+    const response = await fetch("/docs.config.json");
     const config = await response.json();
     return {
       docsDir: config.docsDir || "docs",
-      title: config.title || "Documentation", 
-      description: config.description || ""
+      title: config.title || "Documentation",
+      description: config.description || "",
     };
   } catch {
-    return { 
+    return {
       docsDir: "docs",
       title: "Documentation",
-      description: ""
+      description: "",
     };
   }
 }
@@ -131,7 +131,11 @@ function TreeNodeComponent({
 
 export function Navigation({ documents }: NavigationProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [config, setConfig] = useState({ docsDir: "docs", title: "Documentation", description: "" });
+  const [config, setConfig] = useState({
+    docsDir: "docs",
+    title: "Documentation",
+    description: "",
+  });
   const tree = buildDocumentTree(documents);
 
   // Load configuration
@@ -171,7 +175,7 @@ export function Navigation({ documents }: NavigationProps) {
     <>
       {/* Floating burger menu button (mobile only) */}
       <button
-        className="mobile-menu-toggle"
+        className="mobile-menu-toggle unified-button"
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         aria-label="Toggle navigation menu"
       >

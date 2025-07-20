@@ -4,6 +4,7 @@ import { Navigation } from "./components/Navigation";
 import { DocPage } from "./components/DocPage";
 import { getDocuments } from "./lib/docs";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { ThemeToggle } from "./components/ThemeToggle";
 
 function App() {
   const documents = getDocuments();
@@ -11,8 +12,13 @@ function App() {
 
   return (
     <ThemeProvider>
-      <div className="app">
+      <div className={`app ${documents.length === 1 ? "single-doc-mode" : ""}`}>
         {documents.length > 1 && <Navigation documents={documents} />}
+        {documents.length === 1 && (
+          <div className="floating-theme-toggle">
+            <ThemeToggle />
+          </div>
+        )}
         <main className="main-content">
           <Routes>
             <Route

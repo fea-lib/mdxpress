@@ -7,7 +7,7 @@ export const ThemeToggle: React.FC = () => {
   return (
     <button
       onClick={toggleTheme}
-      className="theme-toggle"
+      className="theme-toggle unified-button"
       aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
       title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
     >
