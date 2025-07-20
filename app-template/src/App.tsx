@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Navigation } from "./components/Navigation";
 import { DocPage } from "./components/DocPage";
@@ -6,38 +5,11 @@ import { getDocuments } from "./lib/docs";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { ThemeToggle } from "./components/ThemeToggle";
 
-// Read docs configuration
-async function getDocsConfig() {
-  try {
-    const response = await fetch("/docs.config.json");
-    const config = await response.json();
-    return {
-      docsDir: config.docsDir || "docs",
-      title: config.title || "Documentation",
-      description: config.description || "",
-    };
-  } catch {
-    return {
-      docsDir: "docs",
-      title: "Documentation",
-      description: "",
-    };
-  }
-}
+import config from "../docs.config.json";
 
 function App() {
   const documents = getDocuments();
   const firstDocument = documents.length > 0 ? documents[0] : undefined;
-  const [config, setConfig] = useState({
-    docsDir: "docs",
-    title: "Documentation",
-    description: "",
-  });
-
-  // Load configuration
-  useEffect(() => {
-    getDocsConfig().then(setConfig);
-  }, []);
 
   return (
     <ThemeProvider>

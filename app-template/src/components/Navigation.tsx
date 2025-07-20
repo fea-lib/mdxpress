@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ThemeToggle } from "./ThemeToggle";
+import config from "../../docs.config.json";
 
 interface Document {
   slug: string;
@@ -18,26 +19,6 @@ interface TreeNode {
   title?: string;
   children: TreeNode[];
   isExpanded?: boolean;
-}
-
-// Read docs configuration
-async function getDocsConfig() {
-  try {
-    // Import the config file dynamically
-    const response = await fetch("/docs.config.json");
-    const config = await response.json();
-    return {
-      docsDir: config.docsDir || "docs",
-      title: config.title || "Documentation",
-      description: config.description || "",
-    };
-  } catch {
-    return {
-      docsDir: "docs",
-      title: "Documentation",
-      description: "",
-    };
-  }
 }
 
 function buildDocumentTree(documents: Document[]): TreeNode {
@@ -135,17 +116,7 @@ function TreeNodeComponent({
 
 export function Navigation({ documents }: NavigationProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [config, setConfig] = useState({
-    docsDir: "docs",
-    title: "Documentation",
-    description: "",
-  });
   const tree = buildDocumentTree(documents);
-
-  // Load configuration
-  useEffect(() => {
-    getDocsConfig().then(setConfig);
-  }, []);
 
   // Close mobile menu when clicking outside or on a link
   useEffect(() => {

@@ -1,5 +1,5 @@
 {
-  "docsDir": "docs",
+  "docsDir": "example-docs",
   "title": "Interactive Documentation",
   "description": "Interactive documentation with MDX and React"
 }
