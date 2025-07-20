@@ -12,9 +12,14 @@ const components = {
   // Add other custom components here
 };
 
+// Get the base URL, defaulting to "/" for development
+const baseUrl = import.meta.env.BASE_URL ?? "/";
+
+console.log("Base URL:", baseUrl);
+
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <BrowserRouter basename={import.meta.env.BASE_URL || "/"}>
+    <BrowserRouter basename={baseUrl}>
       <MDXProvider components={components}>
         <App />
       </MDXProvider>

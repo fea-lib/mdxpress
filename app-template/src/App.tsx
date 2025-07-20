@@ -8,8 +8,15 @@ import { ThemeToggle } from "./components/ThemeToggle";
 import config from "../docs.config.json";
 
 function App() {
+  console.log("App component mounting...");
   const documents = getDocuments();
   const firstDocument = documents.length > 0 ? documents[0] : undefined;
+
+  console.log("App debug:", {
+    documentsCount: documents.length,
+    firstDocument: firstDocument?.title,
+    configDocsDir: config.docsDir,
+  });
 
   return (
     <ThemeProvider>

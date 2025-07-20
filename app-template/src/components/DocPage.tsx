@@ -18,7 +18,7 @@ export function DocPage({ documents }: DocPageProps) {
 
   // Extract slug from pathname, removing the base URL and docs directory prefix
   // First strip the base URL, then extract the slug
-  const baseUrl = (import.meta.env.BASE_URL || "/").replace(/\/$/, "");
+  const baseUrl = (import.meta.env.BASE_URL ?? "/").replace(/\/$/, "");
   const relativePath = location.pathname.replace(baseUrl, "");
   const pathParts = relativePath.split("/");
   // Remove empty first element and docs directory
