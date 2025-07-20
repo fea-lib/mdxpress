@@ -1,65 +1,104 @@
-# Interactive Documentation
+# 📝 MDXpress - Interactive Documentation CLI
 
-This is your interactive documentation app, powered by Vite, MDX, and React.
+A copy-in CLI tool that scaffolds a customizable Vite+MDX+React documentation app into any project. Inspired by the shadcn/ui approach, this tool gives you full ownership of your documentation code with zero lock-in.
 
-## Features
+## 🚀 Quick Start
 
-- 🚀 **Interactive Code Examples**: Live code execution with Sandpack
-- 📝 **MDX Support**: Write documentation in MDX format
-- ⚡ **Fast Development**: Powered by Vite
-- 🎨 **Customizable**: Full control over styling and functionality
-- 📱 **Responsive**: Works on all devices
-
-## Getting Started
-
-### Install Dependencies
+### Using curl (recommended)
 
 ```bash
-npm install
+curl -fsSL https://raw.githubusercontent.com/fea-lib/mdxpress/main/cli/setup.sh | bash
 ```
 
-### Start Development Server
+### Using wget
 
 ```bash
-npm run dev
+wget -qO- https://raw.githubusercontent.com/fea-lib/mdxpress/main/cli/setup.sh | bash
 ```
 
-### Build for Production
+### Manual Download
 
-```bash
-npm run build
+Download and run the setup script for your platform:
+
+- **Linux/macOS**: [setup.sh](https://raw.githubusercontent.com/fea-lib/mdxpress/main/cli/setup.sh)
+- **Windows**: [setup.bat](https://raw.githubusercontent.com/fea-lib/mdxpress/main/cli/setup.bat)
+
+## ✨ Features
+
+- 🚀 **Interactive Code Examples**: Live TypeScript/JavaScript execution with provided `CodePlayground` component
+- 📝 **MDX Support**: Write documentation in MDX format with React components
+- ⚡ **Fast Development**: Powered by Vite for instant hot reload
+- 🎨 **Fully Customizable**: Own the code, modify anything you want
+- 📱 **Responsive Design**: Works perfectly on all devices
+- 🔧 **Configurable**: Specify any docs directory structure
+- 📦 **Zero Lock-in**: Copy the code and make it yours
+- 🌐 **Deploy Anywhere**: Static build works with any hosting provider
+
+## 🎯 Perfect For
+
+- Software project documentation
+- Educational content with live code examples
+- API documentation with interactive examples
+- Component libraries and design systems
+- Technical tutorials and guides
+
+## 📋 What You Get
+
+The CLI copies a complete Vite+MDX+React application to your project:
+
+```
+root/
+├── your-docs/
+│   └── **/*.md(x)              # Your actual documentation files
+├── your-docs-app/              # Configurable via CLI
+│   ├── package.json            # Dependencies and scripts
+│   ├── vite.config.ts          # Vite configuration with MDX support
+│   ├── tsconfig.json           # TypeScript configuration
+│   ├── tsconfig.node.json      # Node.js TypeScript configuration
+│   ├── docs.config.json        # Docs directory configuration
+│   ├── index.html              # Entry HTML file
+│   ├── src/
+│   │   ├── main.tsx            # React app entry point
+│   │   ├── App.tsx             # Main application component
+│   │   ├── index.css           # Global styles
+│   │   ├── vite-env.d.ts       # Vite type definitions
+│   │   ├── components/         # React components
+│   │   ├── contexts/           # React contexts (theme, etc.)
+│   │   ├── docs/               # Symlink to your documentation files
+│   │   └── lib/                # Utility functions
+│   └── public/                 # Static assets
 ```
 
-### Preview Production Build
+## 🛠️ Usage
 
-```bash
-npm run preview
-```
-
-## Writing Documentation
-
-1. Create `.mdx` files in your `docs` directory
-2. Add frontmatter with a title:
-   ```mdx
-   ---
-   title: Your Page Title
-   ---
+1. **Run the setup script** (see Quick Start above)
+2. **Configure your setup** when prompted:
+   - Target directory for the docs app
+   - Source directory for your documentation files
+3. **Install dependencies**:
+   ```bash
+   cd your-docs-app
+   npm install
    ```
-3. Write your content using Markdown and React components
-4. Use the `Sandpack` component for interactive code examples
+4. **Start developing**:
+   ```bash
+   npm run dev
+   ```
 
-## Interactive Code Examples
+## 📖 Writing Documentation
 
-Import Sandpack and use it to create interactive code examples:
+Create `.mdx` files in your docs directory:
 
 ```mdx
-import { Sandpack } from '@codesandbox/sandpack-react'
+# Getting Started
 
-<Sandpack
+Here's an interactive React example using the CodePlayground component:
+
+<CodePlayground
   template="react-ts"
   files={{
     "/App.tsx": `export default function App() {
-      return <h1>Hello World!</h1>
+      return <h1>Hello Interactive Docs!</h1>
     }`
   }}
   options={{
@@ -71,46 +110,72 @@ import { Sandpack } from '@codesandbox/sandpack-react'
 />
 ```
 
-## Configuration
+## ⚙️ Configuration
 
-The docs directory can be configured in `docs.config.json`:
+The CLI handles all configuration during setup:
 
-```json
-{
-  "docsDir": "docs",
-  "title": "Interactive Documentation",
-  "description": "Interactive documentation with MDX and React"
-}
+- **Target directory**: Choose where to create your documentation app
+- **Source directory**: Specify where your existing documentation files are located
+- **Automatic symlink**: The CLI creates a symlink from `src/docs/` to your actual documentation directory
+
+The setup creates a seamless connection between your existing docs and the interactive app, so you can keep your documentation files in their original location while powering them with the MDXpress interface.
+
+## 🎨 Customization
+
+Since you own the code, you can customize everything:
+
+- **Styling**: Edit `src/index.css` or add your own CSS
+- **Components**: Create custom components in `src/components/`
+- **Layout**: Modify `src/App.tsx` and navigation
+- **Build process**: Update `vite.config.ts`
+- **Routes**: Add new routes in `src/App.tsx`
+
+## 🚢 Deployment
+
+Build for production and deploy anywhere:
+
+```bash
+npm run build
 ```
 
-## Customization
-
-- **Styling**: Edit `src/index.css` or add your own CSS files
-- **Components**: Add custom components in `src/components/`
-- **Layout**: Modify `src/App.tsx` and related components
-- **Navigation**: Customize `src/components/Navigation.tsx`
-
-## Deployment
-
-Build the app and deploy the `dist` folder to any static hosting service:
-
+Deploy the `dist` folder to:
 - Vercel
-- Netlify
+- Netlify  
 - GitHub Pages
 - AWS S3
-- Any other static hosting provider
+- Any static hosting provider
 
-## Technology Stack
+## 🏗️ Architecture
 
-- **Vite**: Build tool and development server
-- **React**: UI library
-- **MDX**: Markdown with React components
-- **React Router**: Client-side routing
-- **Sandpack**: Interactive code execution
-- **TypeScript**: Type safety
+**Content Layer**:
+- Source documents in Markdown/MDX format
+- Interactive code snippets with Sandpack
+- Configurable docs directory structure
 
-## Need Help?
+**Processing Layer**:
+- Vite build system with HMR
+- MDX compilation with React components
+- TypeScript support throughout
 
-- Check the example documents in the `docs` folder
-- Refer to the [MDX documentation](https://mdxjs.com/)
-- Learn more about [Sandpack](https://sandpack.codesandbox.io/)
+**Presentation Layer**:
+- React-based responsive UI
+- Client-side routing with React Router
+- Customizable styling and theming
+
+## 🤝 Contributing
+
+This project follows the "copy-in" philosophy. The app-template is designed to be copied and customized, not updated through a package manager.
+
+## 📜 License
+
+MIT License - see [LICENSE](LICENSE) for details.
+
+## 🙏 Acknowledgments
+
+- Inspired by [shadcn/ui](https://ui.shadcn.com/)'s copy-in approach
+- Powered by [Vite](https://vitejs.dev/), [MDX](https://mdxjs.com/), and [Sandpack](https://sandpack.codesandbox.io/)
+- Built for the developer community who values ownership and flexibility
+
+---
+
+**Ready to create interactive documentation?** Run the setup script and start documenting! 🚀

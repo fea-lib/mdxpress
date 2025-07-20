@@ -104,7 +104,7 @@ Here's some content with executable code:
 ```
 
 **Vite Configuration Example:**
-```js
+```ts
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import mdx from '@mdx-js/rollup'
@@ -115,7 +115,7 @@ export default defineConfig({
 ```
 
 **Sandpack Integration Pattern:**
-```jsx
+```tsx
 import { Sandpack } from "@codesandbox/sandpack-react";
 
 const InteractiveExample = () => (
@@ -149,7 +149,7 @@ echo "Setup complete! See $TARGET_DIR for your new docs app."
 ```
 
 **Batch Script Example (Windows):**
-```bat
+```bash
 @echo off
 set /p TARGET_DIR=Enter the target directory [docs-app]:
 if "%TARGET_DIR%"=="" set TARGET_DIR=docs-app
