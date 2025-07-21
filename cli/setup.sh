@@ -277,6 +277,11 @@ cd "$ORIGINAL_DIR"
 
 # Copy example docs to the docs directory if it's empty
 if [ -d "$TARGET_DIR/example-docs" ] && [ -z "$(ls -A "$DOCS_DIR" 2>/dev/null)" ]; then
+    # Ensure docs directory exists before copying
+    if [ ! -d "$DOCS_DIR" ]; then
+        echo "📁 Creating docs directory: $DOCS_DIR"
+        mkdir -p "$DOCS_DIR"
+    fi
     echo "📄 Copying example documentation to $DOCS_DIR"
     cp -r "$TARGET_DIR/example-docs"/* "$DOCS_DIR/"
 fi
