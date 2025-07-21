@@ -130,6 +130,9 @@ if /i "%proceed%"=="no" (
 
 echo Starting setup...
 
+REM Store the original directory before any operations
+set ORIGINAL_DIR=%CD%
+
 REM Create docs directory first if it doesn't exist (before template processing)
 if not exist "%DOCS_DIR%" (
     echo 📁 Creating docs directory: %DOCS_DIR%
@@ -167,6 +170,7 @@ if "%LOCAL_MODE%"=="true" (
     if exist "%TEMP_DIR%\app-template\dist" rmdir /s /q "%TEMP_DIR%\app-template\dist" >nul 2>&1
     if exist "%TEMP_DIR%\app-template\build" rmdir /s /q "%TEMP_DIR%\app-template\build" >nul 2>&1
 ) else (
+    ) else (
     REM Download and extract
     cd /d "%TEMP_DIR%"
     curl -L "%REPO_URL%" -o app-template.tar.gz
@@ -178,25 +182,28 @@ if "%LOCAL_MODE%"=="true" (
 
     tar -xzf app-template.tar.gz --strip-components=1
     if %errorlevel% neq 0 (
-        echo ❌ Error extracting template.
+        echo ❌ Error extracting app-template.
         pause
         exit /b 1
     )
 
+    REM Go back to original directory
+    cd /d "%ORIGINAL_DIR%"
+
     REM Check if app-template directory exists
-    if not exist "app-template" (
+    if not exist "%TEMP_DIR%\app-template" (
         echo ❌ Error: Template directory not found in download.
         pause
         exit /b 1
     )
+)
 )
 
 echo ✅ Template ready.
 
 REM Copy app-template to target directory
 echo 📋 Copying app-template to %TARGET_DIR%...
-REM Store the original directory and go back to it
-set ORIGINAL_DIR=%CD%
+REM ORIGINAL_DIR is already set above
 
 REM Create parent directories for target directory if needed
 for %%F in ("%TARGET_DIR%") do set PARENT_DIR=%%~dpF

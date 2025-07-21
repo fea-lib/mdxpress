@@ -160,6 +160,9 @@ fi
 echo ""
 echo "📦 Downloading app-template..."
 
+# Store the original directory before any operations
+ORIGINAL_DIR=$(pwd)
+
 # Create temporary directory
 TEMP_DIR=$(mktemp -d)
 cleanup() {
@@ -202,11 +205,15 @@ if [ "$LOCAL_MODE" = true ]; then
     fi
 else
     # Download and extract
+    # Save current directory before changing to temp
+    CURRENT_DIR=$(pwd)
     cd "$TEMP_DIR"
     curl -L "$REPO_URL" | tar xz --strip-components=1
+    # Go back to original directory
+    cd "$CURRENT_DIR"
 
     # Check if app-template directory exists
-    if [ ! -d "app-template" ]; then
+    if [ ! -d "$TEMP_DIR/app-template" ]; then
         echo "❌ Error: Template directory not found in download."
         exit 1
     fi
@@ -216,8 +223,7 @@ echo "✅ Template ready."
 
 # Copy app-template to target directory
 echo "📋 Copying app-template to $TARGET_DIR..."
-# Store the original directory and go back to it
-ORIGINAL_DIR=$(pwd)
+# ORIGINAL_DIR is already set above
 
 # Create parent directories for target directory if needed
 mkdir -p "$(dirname "$TARGET_DIR")"
