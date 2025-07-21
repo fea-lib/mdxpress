@@ -68,18 +68,18 @@ echo "This script will set up an interactive documentation app in your project."
 echo ""
 
 # Prompt for docs directory first
-read -p "📚 Enter your docs source directory [$DEFAULT_DOCS_DIR]: " DOCS_DIR
+read -p "📚 Enter your docs source directory [$DEFAULT_DOCS_DIR]: " DOCS_DIR </dev/tty
 DOCS_DIR=${DOCS_DIR:-$DEFAULT_DOCS_DIR}
 
 # Prompt for target directory
-read -p "📁 Enter the target directory [$DEFAULT_TARGET_DIR]: " TARGET_DIR
+read -p "📁 Enter the target directory [$DEFAULT_TARGET_DIR]: " TARGET_DIR </dev/tty
 TARGET_DIR=${TARGET_DIR:-$DEFAULT_TARGET_DIR}
 
 # Check if target directory already exists
 if [ -d "$TARGET_DIR" ]; then
     echo ""
     echo "⚠️  Directory '$TARGET_DIR' already exists."
-    read -p "Do you want to continue? This may overwrite existing files (y/N): " confirm
+    read -p "Do you want to continue? This may overwrite existing files (y/N): " confirm </dev/tty
     case $confirm in
         [yY]|[yY][eE][sS])
             echo "Continuing..."
@@ -97,7 +97,7 @@ echo "   Docs directory: $DOCS_DIR"
 echo "   Target directory: $TARGET_DIR"
 echo ""
 
-read -p "Proceed with setup? (Y/n): " proceed
+read -p "Proceed with setup? (Y/n): " proceed </dev/tty
 case $proceed in
     [nN]|[nN][oO])
         echo "Setup cancelled."

@@ -79,7 +79,6 @@ echo This script will set up an interactive documentation app in your project.
 echo.
 
 REM Prompt for docs directory first
-echo.
 set /p DOCS_DIR="📚 Enter your docs source directory [%DEFAULT_DOCS_DIR%]: "
 if "%DOCS_DIR%"=="" set DOCS_DIR=%DEFAULT_DOCS_DIR%
 
@@ -98,11 +97,6 @@ if exist "%TARGET_DIR%" (
         exit /b 0
     )
 )
-
-REM Prompt for docs directory
-echo.
-set /p DOCS_DIR="📚 Enter your docs source directory [%DEFAULT_DOCS_DIR%]: "
-if "%DOCS_DIR%"=="" set DOCS_DIR=%DEFAULT_DOCS_DIR%
 
 echo.
 echo 📋 Setup Summary:
