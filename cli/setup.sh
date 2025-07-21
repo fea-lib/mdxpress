@@ -65,6 +65,7 @@ else
 fi
 
 echo "This script will set up an interactive documentation app in your project."
+echo "Working directory: $(pwd)"
 echo ""
 
 # Prompt for docs directory first
@@ -347,12 +348,15 @@ echo ""
 echo "🎉 Setup complete!"
 echo ""
 echo "📁 Your interactive documentation app is ready in: $TARGET_DIR"
+echo "   Absolute path: $(realpath "$ORIGINAL_DIR/$TARGET_DIR" 2>/dev/null || echo "$ORIGINAL_DIR/$TARGET_DIR")"
 echo "📚 Your docs will be loaded from: $DOCS_DIR (symlinked for live updates)"
+echo "   Absolute path: $(realpath "$ORIGINAL_DIR/$DOCS_DIR" 2>/dev/null || echo "$ORIGINAL_DIR/$DOCS_DIR")"
 echo ""
 echo "🚀 Next steps:"
 echo ""
 echo "1. Navigate to your app directory:"
 echo "   cd $TARGET_DIR"
+echo "   (or: cd \"$(realpath "$ORIGINAL_DIR/$TARGET_DIR" 2>/dev/null || echo "$ORIGINAL_DIR/$TARGET_DIR")\")"
 echo ""
 echo "2. Install dependencies:"
 echo "   npm install"
