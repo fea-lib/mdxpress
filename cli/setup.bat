@@ -156,61 +156,161 @@ if exist "%TARGET_DIR%\package-lock.json" del /q "%TARGET_DIR%\package-lock.json
 if exist "%TARGET_DIR%\yarn.lock" del /q "%TARGET_DIR%\yarn.lock" 2>nul
 if exist "%TARGET_DIR%\dist" rmdir /s /q "%TARGET_DIR%\dist" 2>nul
 if exist "%TARGET_DIR%\build" rmdir /s /q "%TARGET_DIR%\build" 2>nul
+if exist "%TARGET_DIR%\src\docs" (
+    if exist "%TARGET_DIR%\src\docs\" (
+        rmdir /s /q "%TARGET_DIR%\src\docs" 2>nul
+    ) else (
+        del /q "%TARGET_DIR%\src\docs" 2>nul
+    )
+)
+
+REM Clean up template-specific files immediately after copying
+echo 🧹 Cleaning up template-specific configuration...
+cd /d "%TARGET_DIR%"
+
+echo    Current directory: %CD%
+echo    Target directory structure:
+dir /B
+
+REM Remove the existing symlink and config that point to example-docs
+if exist "src\docs" (
+    if exist "src\docs\" (
+        rmdir /s /q "src\docs" 2>nul
+        echo    Removed existing src\docs directory
+    ) else (
+        del "src\docs" 2>nul
+        echo    Removed existing src\docs symlink
+    )
+) else (
+    echo    No existing src\docs found to clean
+)
 
 REM Update docs configuration
 echo ⚙️  Configuring docs directory...
-cd /d "%TARGET_DIR%"
+echo    Debug: DOCS_DIR=%DOCS_DIR%
 
-REM Update docs.config.json
+REM Update docs.config.json with correct relative path
+set "DOCS_CONFIG_PATH=../%DOCS_DIR%"
+if "%DOCS_DIR:~1,1%"==":" (
+    REM Absolute path on Windows (C:\...)
+    set "DOCS_CONFIG_PATH=%DOCS_DIR%"
+    echo    Debug: Using absolute path: %DOCS_CONFIG_PATH%
+) else (
+    echo    Debug: Using relative path: %DOCS_CONFIG_PATH%
+)
+
+REM Replace backslashes with forward slashes for JSON
+set "DOCS_CONFIG_PATH=%DOCS_CONFIG_PATH:\=/%"
+
 (
 echo {
-echo   "docsDir": "%DOCS_DIR%",
-echo   "title": "Interactive Documentation",
+echo   "docsDir": "%DOCS_CONFIG_PATH%",
+echo   "title": "Interactive Documentation",  
 echo   "description": "Interactive documentation with MDX and React"
 echo }
 ) > docs.config.json
 
-REM Create docs directory if it doesn't exist
+if %errorlevel% neq 0 (
+    echo ❌ Error creating docs.config.json
+    pause
+    exit /b 1
+)
+
+echo    Updated docs.config.json with docsDir: %DOCS_CONFIG_PATH%
+echo    Debug: docs.config.json contents:
+type docs.config.json
+
+REM Go back to original directory to create docs directory
+cd /d "%~dp0"
+
+REM Create docs directory if it doesn't exist (relative to script execution)
 if not exist "%DOCS_DIR%" (
     echo 📁 Creating docs directory: %DOCS_DIR%
     mkdir "%DOCS_DIR%"
     
-    REM Copy example docs if docs directory is different
-    if exist "docs" if not "%DOCS_DIR%"=="docs" (
+    REM Copy example docs if available
+    if exist "%TARGET_DIR%\example-docs" (
         echo 📄 Copying example documentation to %DOCS_DIR%
-        xcopy "docs\*" "%DOCS_DIR%\" /E /I /H /Y >nul
-        rmdir /s /q "docs"
+        xcopy "%TARGET_DIR%\example-docs\*" "%DOCS_DIR%\" /E /I /H /Y >nul
+        rmdir /s /q "%TARGET_DIR%\example-docs"
     )
 )
+
+REM Go back to app directory for symlink creation
+cd /d "%TARGET_DIR%"
 
 REM Create symlink from src\docs to the user's docs directory
 echo 🔗 Creating symlink to docs directory...
-REM Remove any existing docs directory in src\
+echo    Debug: Current directory: %CD%
+echo    Debug: TARGET_DIR=%TARGET_DIR%
+echo    Debug: DOCS_DIR=%DOCS_DIR%
+
+REM Ensure src directory exists
+if not exist "src" (
+    echo ❌ Error: src directory not found in template
+    echo    Debug: Current directory contents:
+    dir /B
+    pause
+    exit /b 1
+)
+
+REM Ensure src\docs is completely clean (double-check)
 if exist "src\docs" (
     if exist "src\docs\" (
-        rmdir /s /q "src\docs"
+        rmdir /s /q "src\docs" 2>nul
+        echo    Cleaned existing src\docs directory
     ) else (
-        del "src\docs"
+        del "src\docs" 2>nul
+        echo    Cleaned existing src\docs symlink
     )
 )
 
-REM Create directory symlink to the user's docs directory
-REM Note: mklink /D requires Administrator privileges on older Windows versions
-if "%DOCS_DIR%"=="docs" (
-    REM If docs directory is relative to the app directory
-    mklink /D "src\docs" "..\..\%DOCS_DIR%"
+REM Create directory symlink with correct path calculation
+if "%DOCS_DIR:~1,1%"==":" (
+    REM Absolute path
+    echo    Debug: Creating symlink with absolute path: %DOCS_DIR%
+    mklink /D "src\docs" "%DOCS_DIR%"
+    if %errorlevel% equ 0 (
+        echo ✅ Symlink created: src\docs -^> %DOCS_DIR% (absolute path)
+    ) else (
+        echo ❌ Failed to create symlink to absolute path
+    )
 ) else (
-    REM Convert to absolute path for symlink
-    for %%A in ("%DOCS_DIR%") do set "DOCS_ABSOLUTE=%%~fA"
-    mklink /D "src\docs" "!DOCS_ABSOLUTE!"
+    REM Relative path - go from src back to original dir, then to docs
+    echo    Debug: Creating symlink with relative path: ..\..\%DOCS_DIR%
+    mklink /D "src\docs" "..\..\%DOCS_DIR%"
+    if %errorlevel% equ 0 (
+        echo ✅ Symlink created: src\docs -^> ..\..\%DOCS_DIR% (relative path)
+    ) else (
+        echo ❌ Failed to create symlink to relative path
+    )
 )
 
-if %errorlevel% equ 0 (
-    echo ✅ Symlink created: src\docs -^> %DOCS_DIR%
-) else (
+if %errorlevel% neq 0 (
     echo ⚠️  Could not create symlink. You may need to run as Administrator.
     echo 📄 Copying docs as fallback...
-    xcopy "%DOCS_DIR%\*" "src\docs\" /E /I /H /Y >nul
+    
+    REM Create src\docs directory first
+    mkdir "src\docs" 2>nul
+    
+    if "%DOCS_DIR:~1,1%"==":" (
+        if exist "%DOCS_DIR%\*" (
+            xcopy "%DOCS_DIR%\*" "src\docs\" /E /I /H /Y >nul
+            echo    Copied docs from absolute path as fallback
+        )
+    ) else (
+        if exist "..\..\%DOCS_DIR%\*" (
+            xcopy "..\..\%DOCS_DIR%\*" "src\docs\" /E /I /H /Y >nul
+            echo    Copied docs from relative path as fallback
+        )
+    )
+) else (
+    REM Verify the symlink was created
+    if exist "src\docs" (
+        echo    Verified: src\docs exists and is accessible
+    ) else (
+        echo ⚠️  Warning: src\docs was not created successfully
+    )
 )
 
 REM Cleanup

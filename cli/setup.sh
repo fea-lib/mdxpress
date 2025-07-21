@@ -132,6 +132,8 @@ if [ "$LOCAL_MODE" = true ]; then
               --exclude='node_modules' \
               --exclude='package-lock.json' \
               --exclude='yarn.lock' \
+              --exclude='src/docs' \
+              --exclude='.env' \
               --exclude='dist' \
               --exclude='build' \
               "$TEMPLATE_PATH/" "$TEMP_DIR/app-template/"
@@ -144,6 +146,8 @@ if [ "$LOCAL_MODE" = true ]; then
         rm -rf "$TEMP_DIR/app-template/node_modules" \
                "$TEMP_DIR/app-template/package-lock.json" \
                "$TEMP_DIR/app-template/yarn.lock" \
+               "$TEMP_DIR/app-template/src/docs" \
+                "$TEMP_DIR/app-template/.env" \
                "$TEMP_DIR/app-template/dist" \
                "$TEMP_DIR/app-template/build" \
                "$TEMP_DIR/app-template/.git" 2>/dev/null || true
@@ -166,53 +170,98 @@ echo "✅ Template ready."
 echo "📋 Copying app-template to $TARGET_DIR..."
 # Store the original directory and go back to it
 ORIGINAL_DIR=$(pwd)
-cp -r "$TEMP_DIR/app-template" "$TARGET_DIR"
+
+# The template is already prepared in TEMP_DIR/app-template, just move it
+mv "$TEMP_DIR/app-template" "$TARGET_DIR"
+
+# Clean up template-specific files immediately after copying
+echo "🧹 Cleaning up template-specific configuration..."
+cd "$ORIGINAL_DIR/$TARGET_DIR"
+
+# Remove the existing symlink and config that point to example-docs
+if [ -L "src/docs" ]; then
+    rm "src/docs"
+    echo "   Removed existing src/docs symlink"
+fi
+if [ -d "src/docs" ]; then
+    rm -rf "src/docs"
+    echo "   Removed existing src/docs directory"
+fi
 
 # Update docs configuration
 echo "⚙️  Configuring docs directory..."
-cd "$ORIGINAL_DIR/$TARGET_DIR"
 
-# Update docs.config.json
+# Update docs.config.json - use relative path from app directory to docs directory
+if [[ "$DOCS_DIR" = /* ]]; then
+    # Absolute path - use as is
+    DOCS_CONFIG_PATH="$DOCS_DIR"
+else
+    # Relative path - make it relative to the app directory
+    DOCS_CONFIG_PATH="../$DOCS_DIR"
+fi
+
 cat > docs.config.json << EOF
 {
-  "docsDir": "$DOCS_DIR",
+  "docsDir": "$DOCS_CONFIG_PATH",
   "title": "Interactive Documentation",
   "description": "Interactive documentation with MDX and React"
 }
 EOF
 
-# Create docs directory if it doesn't exist
+echo "   Updated docs.config.json with docsDir: $DOCS_CONFIG_PATH"
+
+# Go back to original directory to create docs directory
+cd "$ORIGINAL_DIR"
+
+# Create docs directory if it doesn't exist (relative to script execution)
 if [ ! -d "$DOCS_DIR" ]; then
     echo "📁 Creating docs directory: $DOCS_DIR"
     mkdir -p "$DOCS_DIR"
     
-    # Copy example docs if docs directory is empty
-    if [ -d "docs" ] && [ "$DOCS_DIR" != "docs" ]; then
+    # Copy example docs if available and docs directory is empty
+    if [ -d "$TARGET_DIR/example-docs" ]; then
         echo "📄 Copying example documentation to $DOCS_DIR"
-        cp -r docs/* "$DOCS_DIR/"
-        rm -rf docs
+        cp -r "$TARGET_DIR/example-docs"/* "$DOCS_DIR/"
+        rm -rf "$TARGET_DIR/example-docs"
     fi
 fi
 
+# Go back to app directory for symlink creation
+cd "$ORIGINAL_DIR/$TARGET_DIR"
+
 # Create symlink from src/docs to the user's docs directory
 echo "🔗 Creating symlink to docs directory..."
-# Remove any existing docs directory in src/
+
+# Ensure src directory exists
+if [ ! -d "src" ]; then
+    echo "❌ Error: src directory not found in template"
+    exit 1
+fi
+
+# Ensure src/docs is completely clean (double-check)
 if [ -d "src/docs" ] || [ -L "src/docs" ]; then
     rm -rf "src/docs"
+    echo "   Cleaned existing src/docs"
 fi
 
-# Create symlink to the user's docs directory
-if [ "$DOCS_DIR" = "docs" ]; then
-    # If docs directory is relative to the app directory
-    ln -s "../../$DOCS_DIR" "src/docs"
+# Calculate relative path from src/ to the docs directory
+if [[ "$DOCS_DIR" = /* ]]; then
+    # Absolute path
+    ln -s "$DOCS_DIR" "src/docs"
+    echo "✅ Symlink created: src/docs -> $DOCS_DIR (absolute path)"
 else
-    # If docs directory is an absolute path or different relative path
-    # Convert to relative path from src/ directory
-    DOCS_RELATIVE_PATH=$(realpath --relative-to="$(pwd)/src" "$DOCS_DIR" 2>/dev/null || echo "../../$DOCS_DIR")
-    ln -s "$DOCS_RELATIVE_PATH" "src/docs"
+    # Relative path - need to go from src/ back to original dir, then to docs
+    ln -s "../../$DOCS_DIR" "src/docs"
+    echo "✅ Symlink created: src/docs -> ../../$DOCS_DIR (relative path)"
 fi
 
-echo "✅ Symlink created: src/docs -> $DOCS_DIR"
+# Verify the symlink was created correctly
+if [ -L "src/docs" ]; then
+    ACTUAL_TARGET=$(readlink "src/docs")
+    echo "   Verified: symlink points to $ACTUAL_TARGET"
+else
+    echo "⚠️  Warning: symlink creation may have failed"
+fi
 
 echo ""
 echo "🎉 Setup complete!"
