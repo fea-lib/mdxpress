@@ -10,7 +10,41 @@ import config from "../docs.config.json";
 function App() {
   console.log("App component mounting...");
   const documents = getDocuments();
-  const firstDocument = documents.length > 0 ? documents[0] : undefined;
+
+  // Find the best default document: README or index files first, then fallback to first document
+  const findDefaultDocument = (docs: ReturnType<typeof getDocuments>) => {
+    if (docs.length === 0) return undefined;
+
+    // Look for README.md(x) or index.md(x) files, prioritizing those closest to root
+    const readmeOrIndex = docs
+      .filter((doc) => {
+        const filename = doc.slug.split("/").pop()?.toLowerCase() || "";
+        const basename = filename.replace(/\.(mdx?|md)$/, "");
+        return basename === "readme" || basename === "index";
+      })
+      .sort((a, b) => {
+        // Sort by depth (fewer slashes = closer to root)
+        const depthA = a.slug.split("/").length;
+        const depthB = b.slug.split("/").length;
+        if (depthA !== depthB) return depthA - depthB;
+
+        // If same depth, prioritize README over index
+        const nameA = a.slug.split("/").pop()?.toLowerCase() || "";
+        const nameB = b.slug.split("/").pop()?.toLowerCase() || "";
+        const basenameA = nameA.replace(/\.(mdx?|md)$/, "");
+        const basenameB = nameB.replace(/\.(mdx?|md)$/, "");
+
+        if (basenameA === "readme" && basenameB === "index") return -1;
+        if (basenameA === "index" && basenameB === "readme") return 1;
+
+        return 0;
+      });
+
+    // Return the best README/index file, or fall back to the first document
+    return readmeOrIndex.length > 0 ? readmeOrIndex[0] : docs[0];
+  };
+
+  const firstDocument = findDefaultDocument(documents);
 
   // Derive route prefix from docsDir (use last segment or "docs" as fallback)
   const routePrefix = config.docsDir
@@ -20,8 +54,24 @@ function App() {
   console.log("App debug:", {
     documentsCount: documents.length,
     firstDocument: firstDocument?.title,
+    firstDocumentSlug: firstDocument?.slug,
     configDocsDir: config.docsDir,
     routePrefix: routePrefix,
+    selectedReason: firstDocument
+      ? firstDocument.slug
+          .split("/")
+          .pop()
+          ?.toLowerCase()
+          .replace(/\.(mdx?|md)$/, "") === "readme"
+        ? "README found"
+        : firstDocument.slug
+            .split("/")
+            .pop()
+            ?.toLowerCase()
+            .replace(/\.(mdx?|md)$/, "") === "index"
+        ? "INDEX found"
+        : "Fallback to first document"
+      : "No documents",
   });
 
   return (
