@@ -2,6 +2,18 @@
 
 All notable changes to MDXpress will be documented in this file.
 
+## [1.3.0] - 2025-07-21
+
+### Updated
+- **Documentation Structure**: Updated PROJECT_STRUCTURE.md to reflect actual codebase structure
+  - Fixed example-docs directory structure documentation
+  - Added ThemeToggle.tsx component to component list
+  - Corrected documentation file organization and hierarchy
+  - Updated component descriptions to match current implementation
+
+### Changed
+- **App Template Version**: Bumped app-template version to 1.3.0
+
 ## [1.2.0] - 2025-07-20
 
 ### Added
