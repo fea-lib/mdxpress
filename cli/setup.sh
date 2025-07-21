@@ -21,6 +21,33 @@ if ! command -v tar &> /dev/null; then
     exit 1
 fi
 
+# Check Node.js version
+if ! command -v node &> /dev/null; then
+    echo "❌ Error: Node.js is required but not installed."
+    echo "Please install Node.js 18.0.0 or higher from https://nodejs.org/"
+    exit 1
+fi
+
+NODE_VERSION=$(node --version | sed 's/v//')
+echo "✅ Node.js version $NODE_VERSION detected"
+
+# Simple version check - extract major version number
+NODE_MAJOR=$(echo $NODE_VERSION | cut -d. -f1)
+if [ "$NODE_MAJOR" -lt 18 ]; then
+    echo "❌ Error: Node.js $NODE_VERSION is too old. Version 18.0.0 or higher is required."
+    echo "Please update Node.js from https://nodejs.org/"
+    exit 1
+fi
+
+# Check npm version
+if ! command -v npm &> /dev/null; then
+    echo "❌ Error: npm is required but not installed."
+    exit 1
+fi
+
+NPM_VERSION=$(npm --version)
+echo "✅ npm version $NPM_VERSION detected"
+
 # Default values
 DEFAULT_TARGET_DIR="docs-app"
 DEFAULT_DOCS_DIR="docs"
@@ -94,8 +121,33 @@ trap cleanup EXIT
 
 if [ "$LOCAL_MODE" = true ]; then
     echo "📋 Using local app-template..."
-    # Copy local app-template to temp directory
-    cp -r "$TEMPLATE_PATH" "$TEMP_DIR/app-template"
+    # Copy local app-template to temp directory, excluding git-ignored files
+    mkdir -p "$TEMP_DIR/app-template"
+    
+    # Use rsync to copy files while respecting .gitignore
+    if command -v rsync &> /dev/null; then
+        echo "🔄 Copying files (excluding node_modules, dist, and other build artifacts)..."
+        rsync -av --exclude-from="$TEMPLATE_PATH/.gitignore" \
+              --exclude='.git' \
+              --exclude='node_modules' \
+              --exclude='package-lock.json' \
+              --exclude='yarn.lock' \
+              --exclude='dist' \
+              --exclude='build' \
+              "$TEMPLATE_PATH/" "$TEMP_DIR/app-template/"
+    else
+        # Fallback to cp with manual exclusions
+        echo "🔄 Copying files (rsync not available, using cp with manual cleanup)..."
+        cp -r "$TEMPLATE_PATH" "$TEMP_DIR/app-template-tmp"
+        mv "$TEMP_DIR/app-template-tmp" "$TEMP_DIR/app-template"
+        # Remove problematic directories/files
+        rm -rf "$TEMP_DIR/app-template/node_modules" \
+               "$TEMP_DIR/app-template/package-lock.json" \
+               "$TEMP_DIR/app-template/yarn.lock" \
+               "$TEMP_DIR/app-template/dist" \
+               "$TEMP_DIR/app-template/build" \
+               "$TEMP_DIR/app-template/.git" 2>/dev/null || true
+    fi
 else
     # Download and extract
     cd "$TEMP_DIR"
@@ -176,6 +228,9 @@ echo ""
 echo "2. Install dependencies:"
 echo "   npm install"
 echo ""
+echo "   💡 If you encounter installation issues, try:"
+echo "   npm cache clean --force && rm -rf node_modules package-lock.json && npm install"
+echo ""
 echo "3. Start the development server:"
 echo "   npm run dev"
 echo ""
@@ -186,5 +241,10 @@ echo "   - Edit files in src/ to customize the app"
 echo "   - Add .mdx files to $DOCS_DIR for new documentation pages"
 echo "   - Use Sandpack components for interactive code examples"
 echo "   - Changes to docs will auto-reload thanks to the symlink!"
+echo ""
+echo "🔧 Troubleshooting:"
+echo "   - Ensure Node.js >=18.0.0 is installed: node --version"
+echo "   - Ensure npm >=9.0.0 is installed: npm --version"
+echo "   - If Vite fails to start, delete node_modules and reinstall"
 echo ""
 echo "Happy documenting! 📝"

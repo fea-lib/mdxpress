@@ -26,6 +26,39 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
+REM Check Node.js version
+node --version >nul 2>&1
+if %errorlevel% neq 0 (
+    echo ❌ Error: Node.js is required but not installed.
+    echo Please install Node.js 18.0.0 or higher from https://nodejs.org/
+    pause
+    exit /b 1
+)
+
+for /f "tokens=*" %%i in ('node --version') do set NODE_VERSION=%%i
+set NODE_VERSION=%NODE_VERSION:v=%
+echo ✅ Node.js version %NODE_VERSION% detected
+
+REM Simple version check - extract major version number
+for /f "tokens=1 delims=." %%a in ("%NODE_VERSION%") do set NODE_MAJOR=%%a
+if %NODE_MAJOR% lss 18 (
+    echo ❌ Error: Node.js %NODE_VERSION% is too old. Version 18.0.0 or higher is required.
+    echo Please update Node.js from https://nodejs.org/
+    pause
+    exit /b 1
+)
+
+REM Check npm version
+npm --version >nul 2>&1
+if %errorlevel% neq 0 (
+    echo ❌ Error: npm is required but not installed.
+    pause
+    exit /b 1
+)
+
+for /f "tokens=*" %%i in ('npm --version') do set NPM_VERSION=%%i
+echo ✅ npm version %NPM_VERSION% detected
+
 REM Default values
 set DEFAULT_TARGET_DIR=docs-app
 set DEFAULT_DOCS_DIR=docs
@@ -108,14 +141,21 @@ echo ✅ Template downloaded successfully.
 REM Go back to original directory
 cd /d "%~dp0"
 
-REM Copy app-template to target directory
+REM Copy app-template to target directory (excluding problematic files)
 echo 📋 Copying app-template to %TARGET_DIR%...
-xcopy "%TEMP_DIR%\app-template" "%TARGET_DIR%\" /E /I /H /Y >nul
+xcopy "%TEMP_DIR%\app-template" "%TARGET_DIR%\" /E /I /H /Y /EXCLUDE:NUL >nul 2>&1
 if %errorlevel% neq 0 (
     echo ❌ Error copying app-template.
     pause
     exit /b 1
 )
+
+REM Clean up any problematic files that might have been copied
+if exist "%TARGET_DIR%\node_modules" rmdir /s /q "%TARGET_DIR%\node_modules" 2>nul
+if exist "%TARGET_DIR%\package-lock.json" del /q "%TARGET_DIR%\package-lock.json" 2>nul
+if exist "%TARGET_DIR%\yarn.lock" del /q "%TARGET_DIR%\yarn.lock" 2>nul
+if exist "%TARGET_DIR%\dist" rmdir /s /q "%TARGET_DIR%\dist" 2>nul
+if exist "%TARGET_DIR%\build" rmdir /s /q "%TARGET_DIR%\build" 2>nul
 
 REM Update docs configuration
 echo ⚙️  Configuring docs directory...
@@ -190,6 +230,9 @@ echo.
 echo 2. Install dependencies:
 echo    npm install
 echo.
+echo    💡 If you encounter installation issues, try:
+echo    npm cache clean --force ^&^& rmdir /s /q node_modules ^&^& del package-lock.json ^&^& npm install
+echo.
 echo 3. Start the development server:
 echo    npm run dev
 echo.
@@ -200,6 +243,12 @@ echo    - Edit files in src/ to customize the app
 echo    - Add .mdx files to %DOCS_DIR% for new documentation pages
 echo    - Use Sandpack components for interactive code examples
 echo    - Changes to docs will auto-reload thanks to the symlink!
+echo.
+echo 🔧 Troubleshooting:
+echo    - Ensure Node.js ^>=18.0.0 is installed: node --version
+echo    - Ensure npm ^>=9.0.0 is installed: npm --version
+echo    - If Vite fails to start, delete node_modules and reinstall
+echo    - On Windows, you may need to run as Administrator for symlinks
 echo.
 echo Happy documenting! 📝
 pause

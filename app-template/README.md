@@ -91,6 +91,33 @@ root/
    npm run dev
    ```
 
+## 🔧 Troubleshooting
+
+### Installation Issues
+
+If you encounter `ERR_MODULE_NOT_FOUND` or similar installation errors:
+
+1. **Clear npm cache and reinstall**:
+   ```bash
+   npm cache clean --force
+   rm -rf node_modules package-lock.json
+   npm install
+   ```
+
+2. **Verify Node.js and npm versions**:
+   ```bash
+   node --version  # Should be >=18.0.0
+   npm --version   # Should be >=9.0.0
+   ```
+
+3. **If using an older Node.js version**, update from [nodejs.org](https://nodejs.org/)
+
+### Common Issues
+
+- **Vite fails to start**: Delete `node_modules` folder and run `npm install` again
+- **Module resolution errors**: Ensure all dependencies are installed with `npm install`
+- **Port conflicts**: Vite will automatically use a different port if 5173 is busy
+
 ## 📖 Writing Documentation
 
 Create `.mdx` files in your docs directory:
