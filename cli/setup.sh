@@ -67,6 +67,10 @@ fi
 echo "This script will set up an interactive documentation app in your project."
 echo ""
 
+# Prompt for docs directory first
+read -p "📚 Enter your docs source directory [$DEFAULT_DOCS_DIR]: " DOCS_DIR
+DOCS_DIR=${DOCS_DIR:-$DEFAULT_DOCS_DIR}
+
 # Prompt for target directory
 read -p "📁 Enter the target directory [$DEFAULT_TARGET_DIR]: " TARGET_DIR
 TARGET_DIR=${TARGET_DIR:-$DEFAULT_TARGET_DIR}
@@ -87,15 +91,10 @@ if [ -d "$TARGET_DIR" ]; then
     esac
 fi
 
-# Prompt for docs directory
-echo ""
-read -p "📚 Enter your docs source directory [$DEFAULT_DOCS_DIR]: " DOCS_DIR
-DOCS_DIR=${DOCS_DIR:-$DEFAULT_DOCS_DIR}
-
 echo ""
 echo "📋 Setup Summary:"
-echo "   Target directory: $TARGET_DIR"
 echo "   Docs directory: $DOCS_DIR"
+echo "   Target directory: $TARGET_DIR"
 echo ""
 
 read -p "Proceed with setup? (Y/n): " proceed
@@ -108,6 +107,12 @@ case $proceed in
         echo "Starting setup..."
         ;;
 esac
+
+# Create docs directory first if it doesn't exist (before template processing)
+if [ ! -d "$DOCS_DIR" ]; then
+    echo "📁 Creating docs directory: $DOCS_DIR"
+    mkdir -p "$DOCS_DIR"
+fi
 
 echo ""
 echo "📦 Downloading app-template..."
@@ -127,7 +132,7 @@ if [ "$LOCAL_MODE" = true ]; then
     # Use rsync to copy files while respecting .gitignore
     if command -v rsync &> /dev/null; then
         echo "🔄 Copying files (excluding node_modules, dist, and other build artifacts)..."
-        rsync -av --exclude-from="$TEMPLATE_PATH/.gitignore" \
+        rsync -avL --exclude-from="$TEMPLATE_PATH/.gitignore" \
               --exclude='.git' \
               --exclude='node_modules' \
               --exclude='package-lock.json' \
@@ -140,14 +145,14 @@ if [ "$LOCAL_MODE" = true ]; then
     else
         # Fallback to cp with manual exclusions
         echo "🔄 Copying files (rsync not available, using cp with manual cleanup)..."
-        cp -r "$TEMPLATE_PATH" "$TEMP_DIR/app-template-tmp"
+        cp -rL "$TEMPLATE_PATH" "$TEMP_DIR/app-template-tmp" 2>/dev/null || cp -r "$TEMPLATE_PATH" "$TEMP_DIR/app-template-tmp"
         mv "$TEMP_DIR/app-template-tmp" "$TEMP_DIR/app-template"
         # Remove problematic directories/files
         rm -rf "$TEMP_DIR/app-template/node_modules" \
                "$TEMP_DIR/app-template/package-lock.json" \
                "$TEMP_DIR/app-template/yarn.lock" \
                "$TEMP_DIR/app-template/src/docs" \
-                "$TEMP_DIR/app-template/.env" \
+               "$TEMP_DIR/app-template/.env" \
                "$TEMP_DIR/app-template/dist" \
                "$TEMP_DIR/app-template/build" \
                "$TEMP_DIR/app-template/.git" 2>/dev/null || true
@@ -171,8 +176,22 @@ echo "📋 Copying app-template to $TARGET_DIR..."
 # Store the original directory and go back to it
 ORIGINAL_DIR=$(pwd)
 
-# The template is already prepared in TEMP_DIR/app-template, just move it
-mv "$TEMP_DIR/app-template" "$TARGET_DIR"
+# Create parent directories for target directory if needed
+mkdir -p "$(dirname "$TARGET_DIR")"
+
+# Create the target directory itself if it doesn't exist
+mkdir -p "$TARGET_DIR"
+
+# The template is already prepared in TEMP_DIR/app-template, copy contents to target
+# Use cp -L to resolve any symlinks during copy to avoid broken symlink issues
+cp -rL "$TEMP_DIR/app-template"/* "$TARGET_DIR/" 2>/dev/null || {
+    # If -L fails (some systems don't support it), fall back to regular copy
+    echo "   Falling back to regular copy..."
+    cp -r "$TEMP_DIR/app-template"/* "$TARGET_DIR/" || {
+        echo "❌ Error copying app-template to target directory."
+        exit 1
+    }
+}
 
 # Clean up template-specific files immediately after copying
 echo "🧹 Cleaning up template-specific configuration..."
@@ -191,13 +210,14 @@ fi
 # Update docs configuration
 echo "⚙️  Configuring docs directory..."
 
-# Update docs.config.json - use relative path from app directory to docs directory
+# Calculate the docs directory path relative to the repository root
+# The app will be in $TARGET_DIR, so we need to express DOCS_DIR relative to repo root
 if [[ "$DOCS_DIR" = /* ]]; then
-    # Absolute path - use as is
+    # Absolute path - use as is (though this is not recommended for portability)
     DOCS_CONFIG_PATH="$DOCS_DIR"
 else
-    # Relative path - make it relative to the app directory
-    DOCS_CONFIG_PATH="../$DOCS_DIR"
+    # Relative path from current directory (which is repo root when script runs)
+    DOCS_CONFIG_PATH="$DOCS_DIR"
 fi
 
 cat > docs.config.json << EOF
@@ -208,22 +228,20 @@ cat > docs.config.json << EOF
 }
 EOF
 
-echo "   Updated docs.config.json with docsDir: $DOCS_CONFIG_PATH"
+echo "   Updated docs.config.json with docsDir: $DOCS_CONFIG_PATH (repository-root relative)"
 
-# Go back to original directory to create docs directory
+# Go back to original directory to handle example docs
 cd "$ORIGINAL_DIR"
 
-# Create docs directory if it doesn't exist (relative to script execution)
-if [ ! -d "$DOCS_DIR" ]; then
-    echo "📁 Creating docs directory: $DOCS_DIR"
-    mkdir -p "$DOCS_DIR"
-    
-    # Copy example docs if available and docs directory is empty
-    if [ -d "$TARGET_DIR/example-docs" ]; then
-        echo "📄 Copying example documentation to $DOCS_DIR"
-        cp -r "$TARGET_DIR/example-docs"/* "$DOCS_DIR/"
-        rm -rf "$TARGET_DIR/example-docs"
-    fi
+# Copy example docs to the docs directory if it's empty
+if [ -d "$TARGET_DIR/example-docs" ] && [ -z "$(ls -A "$DOCS_DIR" 2>/dev/null)" ]; then
+    echo "📄 Copying example documentation to $DOCS_DIR"
+    cp -r "$TARGET_DIR/example-docs"/* "$DOCS_DIR/"
+fi
+
+# Remove example-docs from the app directory since we've processed it
+if [ -d "$TARGET_DIR/example-docs" ]; then
+    rm -rf "$TARGET_DIR/example-docs"
 fi
 
 # Go back to app directory for symlink creation
@@ -250,9 +268,24 @@ if [[ "$DOCS_DIR" = /* ]]; then
     ln -s "$DOCS_DIR" "src/docs"
     echo "✅ Symlink created: src/docs -> $DOCS_DIR (absolute path)"
 else
-    # Relative path - need to go from src/ back to original dir, then to docs
-    ln -s "../../$DOCS_DIR" "src/docs"
-    echo "✅ Symlink created: src/docs -> ../../$DOCS_DIR (relative path)"
+    # Relative path - calculate from current app directory to the docs directory
+    # We need to go back to the repository root, then to the docs directory
+    
+    # Count the depth of the target directory to calculate relative path
+    TARGET_DEPTH=$(echo "$TARGET_DIR" | tr '/' '\n' | wc -l)
+    RELATIVE_PATH=""
+    for ((i=1; i<=TARGET_DEPTH; i++)); do
+        RELATIVE_PATH="../$RELATIVE_PATH"
+    done
+    
+    # Add one more ../ to go from src/ to the app directory
+    RELATIVE_PATH="../$RELATIVE_PATH"
+    
+    # Append the docs directory
+    SYMLINK_TARGET="${RELATIVE_PATH}${DOCS_DIR}"
+    
+    ln -s "$SYMLINK_TARGET" "src/docs"
+    echo "✅ Symlink created: src/docs -> $SYMLINK_TARGET (relative path)"
 fi
 
 # Verify the symlink was created correctly

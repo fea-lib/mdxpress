@@ -64,8 +64,24 @@ set DEFAULT_TARGET_DIR=docs-app
 set DEFAULT_DOCS_DIR=docs
 set REPO_URL=https://github.com/fea-lib/mdxpress/archive/refs/heads/main.tar.gz
 
+REM Check if we're running locally (for development)
+set SCRIPT_DIR=%~dp0
+if exist "%SCRIPT_DIR%..\app-template\package.json" (
+    set LOCAL_MODE=true
+    set TEMPLATE_PATH=%SCRIPT_DIR%..\app-template
+    echo 🔧 Running in local development mode
+) else (
+    set LOCAL_MODE=false
+    echo 🌐 Running in remote mode
+)
+
 echo This script will set up an interactive documentation app in your project.
 echo.
+
+REM Prompt for docs directory first
+echo.
+set /p DOCS_DIR="📚 Enter your docs source directory [%DEFAULT_DOCS_DIR%]: "
+if "%DOCS_DIR%"=="" set DOCS_DIR=%DEFAULT_DOCS_DIR%
 
 REM Prompt for target directory
 set /p TARGET_DIR="📁 Enter the target directory [%DEFAULT_TARGET_DIR%]: "
@@ -90,8 +106,8 @@ if "%DOCS_DIR%"=="" set DOCS_DIR=%DEFAULT_DOCS_DIR%
 
 echo.
 echo 📋 Setup Summary:
-echo    Target directory: %TARGET_DIR%
 echo    Docs directory: %DOCS_DIR%
+echo    Target directory: %TARGET_DIR%
 echo.
 
 set /p proceed="Proceed with setup? (Y/n): "
@@ -106,6 +122,12 @@ if /i "%proceed%"=="no" (
     exit /b 0
 )
 
+REM Create docs directory first if it doesn't exist (before template processing)
+if not exist "%DOCS_DIR%" (
+    echo 📁 Creating docs directory: %DOCS_DIR%
+    mkdir "%DOCS_DIR%"
+)
+
 echo.
 echo 📦 Downloading app-template...
 
@@ -113,64 +135,78 @@ REM Create temporary directory
 set TEMP_DIR=%TEMP%\mdxpress_setup_%RANDOM%
 mkdir "%TEMP_DIR%"
 
-REM Download and extract
-cd /d "%TEMP_DIR%"
-curl -L "%REPO_URL%" -o app-template.tar.gz
-if %errorlevel% neq 0 (
-    echo ❌ Error downloading app-template.
-    pause
-    exit /b 1
-)
+if "%LOCAL_MODE%"=="true" (
+    echo 📋 Using local app-template...
+    REM Copy local app-template to temp directory, excluding problematic files
+    mkdir "%TEMP_DIR%\app-template"
+    echo 🔄 Copying files excluding node_modules, dist, and other build artifacts...
+    
+    REM Copy template files while excluding problematic directories
+    xcopy "%TEMPLATE_PATH%\*" "%TEMP_DIR%\app-template\" /E /I /H /Y /EXCLUDE:"%TEMPLATE_PATH%\.gitignore" >nul 2>&1
+    
+    REM Remove problematic directories/files that might have been copied
+    if exist "%TEMP_DIR%\app-template\node_modules" rmdir /s /q "%TEMP_DIR%\app-template\node_modules" >nul 2>&1
+    if exist "%TEMP_DIR%\app-template\package-lock.json" del /q "%TEMP_DIR%\app-template\package-lock.json" >nul 2>&1
+    if exist "%TEMP_DIR%\app-template\yarn.lock" del /q "%TEMP_DIR%\app-template\yarn.lock" >nul 2>&1
+    if exist "%TEMP_DIR%\app-template\src\docs" (
+        if exist "%TEMP_DIR%\app-template\src\docs\" (
+            rmdir /s /q "%TEMP_DIR%\app-template\src\docs" >nul 2>&1
+        ) else (
+            del /q "%TEMP_DIR%\app-template\src\docs" >nul 2>&1
+        )
+    )
+    if exist "%TEMP_DIR%\app-template\.env" del /q "%TEMP_DIR%\app-template\.env" >nul 2>&1
+    if exist "%TEMP_DIR%\app-template\dist" rmdir /s /q "%TEMP_DIR%\app-template\dist" >nul 2>&1
+    if exist "%TEMP_DIR%\app-template\build" rmdir /s /q "%TEMP_DIR%\app-template\build" >nul 2>&1
+) else (
+    REM Download and extract
+    cd /d "%TEMP_DIR%"
+    curl -L "%REPO_URL%" -o app-template.tar.gz
+    if %errorlevel% neq 0 (
+        echo ❌ Error downloading app-template.
+        pause
+        exit /b 1
+    )
 
-tar -xzf app-template.tar.gz --strip-components=1
-if %errorlevel% neq 0 (
-    echo ❌ Error extracting template.
-    pause
-    exit /b 1
-)
+    tar -xzf app-template.tar.gz --strip-components=1
+    if %errorlevel% neq 0 (
+        echo ❌ Error extracting template.
+        pause
+        exit /b 1
+    )
 
-REM Check if app-template directory exists
-if not exist "app-template" (
-    echo ❌ Error: Template directory not found in download.
-    pause
-    exit /b 1
-)
-
-echo ✅ Template downloaded successfully.
-
-REM Go back to original directory
-cd /d "%~dp0"
-
-REM Copy app-template to target directory (excluding problematic files)
-echo 📋 Copying app-template to %TARGET_DIR%...
-xcopy "%TEMP_DIR%\app-template" "%TARGET_DIR%\" /E /I /H /Y /EXCLUDE:NUL >nul 2>&1
-if %errorlevel% neq 0 (
-    echo ❌ Error copying app-template.
-    pause
-    exit /b 1
-)
-
-REM Clean up any problematic files that might have been copied
-if exist "%TARGET_DIR%\node_modules" rmdir /s /q "%TARGET_DIR%\node_modules" 2>nul
-if exist "%TARGET_DIR%\package-lock.json" del /q "%TARGET_DIR%\package-lock.json" 2>nul
-if exist "%TARGET_DIR%\yarn.lock" del /q "%TARGET_DIR%\yarn.lock" 2>nul
-if exist "%TARGET_DIR%\dist" rmdir /s /q "%TARGET_DIR%\dist" 2>nul
-if exist "%TARGET_DIR%\build" rmdir /s /q "%TARGET_DIR%\build" 2>nul
-if exist "%TARGET_DIR%\src\docs" (
-    if exist "%TARGET_DIR%\src\docs\" (
-        rmdir /s /q "%TARGET_DIR%\src\docs" 2>nul
-    ) else (
-        del /q "%TARGET_DIR%\src\docs" 2>nul
+    REM Check if app-template directory exists
+    if not exist "app-template" (
+        echo ❌ Error: Template directory not found in download.
+        pause
+        exit /b 1
     )
 )
 
-REM Clean up template-specific files immediately after copying
-echo 🧹 Cleaning up template-specific configuration...
-cd /d "%TARGET_DIR%"
+echo ✅ Template ready.
 
-echo    Current directory: %CD%
-echo    Target directory structure:
-dir /B
+REM Copy app-template to target directory
+echo 📋 Copying app-template to %TARGET_DIR%...
+REM Store the original directory and go back to it
+set ORIGINAL_DIR=%CD%
+
+REM Create parent directories for target directory if needed
+for %%F in ("%TARGET_DIR%") do set PARENT_DIR=%%~dpF
+if not exist "%PARENT_DIR%" mkdir "%PARENT_DIR%"
+
+REM Create the target directory itself if it doesn't exist
+if not exist "%TARGET_DIR%" mkdir "%TARGET_DIR%"
+
+REM The template is already prepared in TEMP_DIR\app-template, copy contents to target
+xcopy "%TEMP_DIR%\app-template\*" "%TARGET_DIR%\" /E /I /H /Y >nul
+if %errorlevel% neq 0 (
+    echo ❌ Error copying app-template to target directory.
+    pause
+    exit /b 1
+)
+
+echo 🧹 Cleaning up template-specific configuration...
+cd /d "%ORIGINAL_DIR%\%TARGET_DIR%"
 
 REM Remove the existing symlink and config that point to example-docs
 if exist "src\docs" (
@@ -181,22 +217,19 @@ if exist "src\docs" (
         del "src\docs" 2>nul
         echo    Removed existing src\docs symlink
     )
-) else (
-    echo    No existing src\docs found to clean
 )
 
 REM Update docs configuration
 echo ⚙️  Configuring docs directory...
-echo    Debug: DOCS_DIR=%DOCS_DIR%
 
-REM Update docs.config.json with correct relative path
-set "DOCS_CONFIG_PATH=../%DOCS_DIR%"
+REM Calculate the docs directory path relative to the repository root
+REM The app will be in %TARGET_DIR%, so we need to express DOCS_DIR relative to repo root
 if "%DOCS_DIR:~1,1%"==":" (
-    REM Absolute path on Windows (C:\...)
+    REM Absolute path - use as is (though this is not recommended for portability)
     set "DOCS_CONFIG_PATH=%DOCS_DIR%"
-    echo    Debug: Using absolute path: %DOCS_CONFIG_PATH%
 ) else (
-    echo    Debug: Using relative path: %DOCS_CONFIG_PATH%
+    REM Relative path from current directory (which is repo root when script runs)
+    set "DOCS_CONFIG_PATH=%DOCS_DIR%"
 )
 
 REM Replace backslashes with forward slashes for JSON
@@ -216,12 +249,10 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-echo    Updated docs.config.json with docsDir: %DOCS_CONFIG_PATH%
-echo    Debug: docs.config.json contents:
-type docs.config.json
+echo    Updated docs.config.json with docsDir: %DOCS_CONFIG_PATH% (repository-root relative)
 
 REM Go back to original directory to create docs directory
-cd /d "%~dp0"
+cd /d "%ORIGINAL_DIR%"
 
 REM Create docs directory if it doesn't exist (relative to script execution)
 if not exist "%DOCS_DIR%" (
@@ -237,19 +268,14 @@ if not exist "%DOCS_DIR%" (
 )
 
 REM Go back to app directory for symlink creation
-cd /d "%TARGET_DIR%"
+cd /d "%ORIGINAL_DIR%\%TARGET_DIR%"
 
 REM Create symlink from src\docs to the user's docs directory
 echo 🔗 Creating symlink to docs directory...
-echo    Debug: Current directory: %CD%
-echo    Debug: TARGET_DIR=%TARGET_DIR%
-echo    Debug: DOCS_DIR=%DOCS_DIR%
 
 REM Ensure src directory exists
 if not exist "src" (
     echo ❌ Error: src directory not found in template
-    echo    Debug: Current directory contents:
-    dir /B
     pause
     exit /b 1
 )
@@ -268,7 +294,6 @@ if exist "src\docs" (
 REM Create directory symlink with correct path calculation
 if "%DOCS_DIR:~1,1%"==":" (
     REM Absolute path
-    echo    Debug: Creating symlink with absolute path: %DOCS_DIR%
     mklink /D "src\docs" "%DOCS_DIR%"
     if %errorlevel% equ 0 (
         echo ✅ Symlink created: src\docs -^> %DOCS_DIR% (absolute path)
@@ -276,11 +301,15 @@ if "%DOCS_DIR:~1,1%"==":" (
         echo ❌ Failed to create symlink to absolute path
     )
 ) else (
-    REM Relative path - go from src back to original dir, then to docs
-    echo    Debug: Creating symlink with relative path: ..\..\%DOCS_DIR%
-    mklink /D "src\docs" "..\..\%DOCS_DIR%"
+    REM Relative path - calculate from current app directory to the docs directory
+    REM Count the depth of the target directory to calculate relative path
+    set RELATIVE_PATH=..\
+    for %%i in (%TARGET_DIR:\= %) do set RELATIVE_PATH=!RELATIVE_PATH!..\
+    set SYMLINK_TARGET=!RELATIVE_PATH!%DOCS_DIR%
+    
+    mklink /D "src\docs" "!SYMLINK_TARGET!"
     if %errorlevel% equ 0 (
-        echo ✅ Symlink created: src\docs -^> ..\..\%DOCS_DIR% (relative path)
+        echo ✅ Symlink created: src\docs -^> !SYMLINK_TARGET! (relative path)
     ) else (
         echo ❌ Failed to create symlink to relative path
     )
@@ -304,7 +333,6 @@ if %errorlevel% neq 0 (
             echo    Copied docs from relative path as fallback
         )
     )
-) else (
     REM Verify the symlink was created
     if exist "src\docs" (
         echo    Verified: src\docs exists and is accessible

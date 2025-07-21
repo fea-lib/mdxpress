@@ -12,10 +12,16 @@ function App() {
   const documents = getDocuments();
   const firstDocument = documents.length > 0 ? documents[0] : undefined;
 
+  // Derive route prefix from docsDir (use last segment or "docs" as fallback)
+  const routePrefix = config.docsDir
+    ? config.docsDir.split("/").pop() || "docs"
+    : "docs";
+
   console.log("App debug:", {
     documentsCount: documents.length,
     firstDocument: firstDocument?.title,
     configDocsDir: config.docsDir,
+    routePrefix: routePrefix,
   });
 
   return (
@@ -34,7 +40,7 @@ function App() {
               element={
                 firstDocument ? (
                   <Navigate
-                    to={`${config.docsDir}/${firstDocument.slug}`}
+                    to={`/${routePrefix}/${firstDocument.slug}`}
                     replace
                   />
                 ) : (
@@ -43,7 +49,7 @@ function App() {
               }
             />
             <Route
-              path={`${config.docsDir}/*`}
+              path={`/${routePrefix}/*`}
               element={<DocPage documents={documents} />}
             />
           </Routes>

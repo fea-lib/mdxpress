@@ -32,6 +32,17 @@ export default defineConfig({
       jsxRuntime: "automatic",
     }),
   ],
+  server: {
+    watch: {
+      // Ignore app directories within the docs to prevent infinite loops
+      ignored: [
+        "**/docs/**/app/**",
+        "**/docs/**/apps/**",
+        "**/docs/**/*-app/**",
+        "**/docs/**/app-*/**",
+      ],
+    },
+  },
   resolve: {
     alias: {
       "@": resolve(__dirname, "./src"),

@@ -9,19 +9,33 @@ interface Document {
 
 // This function will be dynamically populated by the CLI
 export function getDocuments(): Document[] {
-  // Import all MDX and MD files from the docs directory (parent of docs-app)
+  // Import all MDX and MD files from the docs directory (symlinked as src/docs)
   const modules = import.meta.glob("@/docs/**/*.{md,mdx}", { eager: true });
-  const docsDir = "docs"; // Always use "docs" for the local directory name
+  const localDocsDir = "docs"; // Always use "docs" for the local symlinked directory
   const documents: Document[] = [];
 
   for (const [path, module] of Object.entries(modules)) {
     // Check if this file is from the configured docs directory
     const pathSegments = path.split("/");
     const docsDirIndex = pathSegments.findIndex(
-      (segment) => segment === docsDir
+      (segment) => segment === localDocsDir
     );
 
     if (docsDirIndex === -1) {
+      continue;
+    }
+
+    // Skip any paths that contain app directories to avoid symlink loops
+    // This prevents scanning into app directories that might be within the docs
+    const pathAfterDocs = pathSegments.slice(docsDirIndex + 1);
+    if (
+      pathAfterDocs.some(
+        (segment) =>
+          segment === "app" ||
+          segment.endsWith("-app") ||
+          segment.startsWith("app-")
+      )
+    ) {
       continue;
     }
 
