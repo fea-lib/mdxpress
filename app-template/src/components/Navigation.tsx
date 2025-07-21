@@ -50,6 +50,27 @@ function buildDocumentTree(documents: Document[]): TreeNode {
     });
   });
 
+  // Sort all children recursively: directories first, then files, both A-Z
+  const sortChildren = (node: TreeNode) => {
+    node.children.sort((a, b) => {
+      const aIsDirectory = a.children.length > 0;
+      const bIsDirectory = b.children.length > 0;
+
+      // If one is directory and other is file, directory comes first
+      if (aIsDirectory && !bIsDirectory) return -1;
+      if (!aIsDirectory && bIsDirectory) return 1;
+
+      // Both are same type, sort alphabetically by display name
+      const aName = (a.title || a.name).toLowerCase();
+      const bName = (b.title || b.name).toLowerCase();
+      return aName.localeCompare(bName);
+    });
+
+    // Recursively sort children of each node
+    node.children.forEach(sortChildren);
+  };
+
+  sortChildren(root);
   return root;
 }
 

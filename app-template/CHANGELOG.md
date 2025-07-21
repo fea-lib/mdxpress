@@ -2,6 +2,25 @@
 
 All notable changes to MDXpress will be documented in this file.
 
+## [1.4.0] - 2025-07-21
+
+### Enhanced
+- **Default Document Selection**: Improved logic for selecting the default document on app startup
+  - Now prioritizes README.md(x) or index.md(x) files over alphabetically first document
+  - Searches for README/index files closest to the documentation root
+  - Falls back to first document if no README/index is found
+  - Case-insensitive matching for README and index files
+
+### Improved
+- **Navigation Tree Sorting**: Enhanced file tree organization in the navigation sidebar
+  - Directories are now listed before files at every level
+  - All entries are sorted alphabetically (A-Z) within their type
+  - Maintains consistent sorting throughout nested directory structures
+  - Provides more intuitive file explorer-like navigation experience
+
+### Changed
+- **App Template Version**: Bumped app-template version to 1.4.0
+
 ## [1.3.0] - 2025-07-21
 
 ### Updated
