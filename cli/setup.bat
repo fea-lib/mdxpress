@@ -79,23 +79,33 @@ echo This script will set up an interactive documentation app in your project.
 echo.
 
 REM Prompt for docs directory first
-set /p DOCS_DIR="📚 Enter your docs source directory [%DEFAULT_DOCS_DIR%]: "
-if "%DOCS_DIR%"=="" set DOCS_DIR=%DEFAULT_DOCS_DIR%
+echo 📚 Enter your docs source directory [%DEFAULT_DOCS_DIR%]:
+set /p DOCS_DIR=
+if "%DOCS_DIR%"=="" (
+    set DOCS_DIR=%DEFAULT_DOCS_DIR%
+    echo    Using default: %DEFAULT_DOCS_DIR%
+)
 
 REM Prompt for target directory
-set /p TARGET_DIR="📁 Enter the target directory [%DEFAULT_TARGET_DIR%]: "
-if "%TARGET_DIR%"=="" set TARGET_DIR=%DEFAULT_TARGET_DIR%
+echo 📁 Enter the target directory [%DEFAULT_TARGET_DIR%]:
+set /p TARGET_DIR=
+if "%TARGET_DIR%"=="" (
+    set TARGET_DIR=%DEFAULT_TARGET_DIR%
+    echo    Using default: %DEFAULT_TARGET_DIR%
+)
 
 REM Check if target directory already exists
 if exist "%TARGET_DIR%" (
     echo.
     echo ⚠️  Directory '%TARGET_DIR%' already exists.
-    set /p confirm="Do you want to continue? This may overwrite existing files (y/N): "
+    echo Do you want to continue? This may overwrite existing files (y/N):
+    set /p confirm=
     if /i not "!confirm!"=="y" if /i not "!confirm!"=="yes" (
         echo Setup cancelled.
         pause
         exit /b 0
     )
+    echo Continuing...
 )
 
 echo.
@@ -104,7 +114,8 @@ echo    Docs directory: %DOCS_DIR%
 echo    Target directory: %TARGET_DIR%
 echo.
 
-set /p proceed="Proceed with setup? (Y/n): "
+echo Proceed with setup? (Y/n):
+set /p proceed=
 if /i "%proceed%"=="n" (
     echo Setup cancelled.
     pause
@@ -115,6 +126,8 @@ if /i "%proceed%"=="no" (
     pause
     exit /b 0
 )
+
+echo Starting setup...
 
 REM Create docs directory first if it doesn't exist (before template processing)
 if not exist "%DOCS_DIR%" (

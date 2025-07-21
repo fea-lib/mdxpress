@@ -68,18 +68,51 @@ echo "This script will set up an interactive documentation app in your project."
 echo ""
 
 # Prompt for docs directory first
-read -p "📚 Enter your docs source directory [$DEFAULT_DOCS_DIR]: " DOCS_DIR </dev/tty
+if [ -t 0 ]; then
+    # Interactive terminal available
+    read -p "📚 Enter your docs source directory [$DEFAULT_DOCS_DIR]: " DOCS_DIR
+else
+    # Non-interactive mode (piped from curl) - try to read from /dev/tty
+    if [ -c /dev/tty ]; then
+        read -p "📚 Enter your docs source directory [$DEFAULT_DOCS_DIR]: " DOCS_DIR </dev/tty
+    else
+        # No terminal available, use defaults
+        echo "📚 Using default docs directory: $DEFAULT_DOCS_DIR"
+        DOCS_DIR=""
+    fi
+fi
 DOCS_DIR=${DOCS_DIR:-$DEFAULT_DOCS_DIR}
 
 # Prompt for target directory
-read -p "📁 Enter the target directory [$DEFAULT_TARGET_DIR]: " TARGET_DIR </dev/tty
+if [ -t 0 ]; then
+    # Interactive terminal available
+    read -p "📁 Enter the target directory [$DEFAULT_TARGET_DIR]: " TARGET_DIR
+else
+    # Non-interactive mode (piped from curl) - try to read from /dev/tty
+    if [ -c /dev/tty ]; then
+        read -p "📁 Enter the target directory [$DEFAULT_TARGET_DIR]: " TARGET_DIR </dev/tty
+    else
+        # No terminal available, use defaults
+        echo "📁 Using default target directory: $DEFAULT_TARGET_DIR"
+        TARGET_DIR=""
+    fi
+fi
 TARGET_DIR=${TARGET_DIR:-$DEFAULT_TARGET_DIR}
 
 # Check if target directory already exists
 if [ -d "$TARGET_DIR" ]; then
     echo ""
     echo "⚠️  Directory '$TARGET_DIR' already exists."
-    read -p "Do you want to continue? This may overwrite existing files (y/N): " confirm </dev/tty
+    if [ -t 0 ]; then
+        read -p "Do you want to continue? This may overwrite existing files (y/N): " confirm
+    else
+        if [ -c /dev/tty ]; then
+            read -p "Do you want to continue? This may overwrite existing files (y/N): " confirm </dev/tty
+        else
+            echo "Non-interactive mode: continuing with existing directory..."
+            confirm="y"
+        fi
+    fi
     case $confirm in
         [yY]|[yY][eE][sS])
             echo "Continuing..."
@@ -97,7 +130,16 @@ echo "   Docs directory: $DOCS_DIR"
 echo "   Target directory: $TARGET_DIR"
 echo ""
 
-read -p "Proceed with setup? (Y/n): " proceed </dev/tty
+if [ -t 0 ]; then
+    read -p "Proceed with setup? (Y/n): " proceed
+else
+    if [ -c /dev/tty ]; then
+        read -p "Proceed with setup? (Y/n): " proceed </dev/tty
+    else
+        echo "Non-interactive mode: proceeding with setup..."
+        proceed="y"
+    fi
+fi
 case $proceed in
     [nN]|[nN][oO])
         echo "Setup cancelled."
