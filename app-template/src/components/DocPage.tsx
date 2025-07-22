@@ -1,12 +1,12 @@
 import React from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { getDocumentBySlug } from "../lib/docs";
 
 interface Document {
   slug: string;
   title: string;
   path: string;
-  Component: React.ComponentType;
+  importer: () => Promise<any>;
 }
 
 interface DocPageProps {
@@ -37,16 +37,42 @@ export function DocPage({ documents, routePrefix }: DocPageProps) {
     return <div>Document not found</div>;
   }
 
-  const { Component } = document;
+  // Lazy load the MDX/MD file using the importer
+  const [Component, setComponent] = React.useState<React.ComponentType | null>(
+    null
+  );
+  const [error, setError] = React.useState<Error | null>(null);
+  const [loading, setLoading] = React.useState(true);
 
-  try {
-    return (
-      <div className="doc-content">
-        <Component />
-      </div>
-    );
-  } catch (error) {
-    console.error("Error rendering component:", error);
+  React.useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    setComponent(null);
+    document
+      .importer()
+      .then((mod) => {
+        if (!cancelled) {
+          setComponent(() => mod.default);
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setError(err instanceof Error ? err : new Error(String(err)));
+          setLoading(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+    // Only re-run when document changes
+  }, [document]);
+
+  if (loading) {
+    return <div className="doc-content">Loading...</div>;
+  }
+  if (error) {
     return (
       <div className="doc-content">
         <h1>Error Loading Document</h1>
@@ -58,4 +84,12 @@ export function DocPage({ documents, routePrefix }: DocPageProps) {
       </div>
     );
   }
+  if (!Component) {
+    return <div className="doc-content">No content found.</div>;
+  }
+  return (
+    <div className="doc-content">
+      <Component />
+    </div>
+  );
 }
