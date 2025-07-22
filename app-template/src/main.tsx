@@ -15,8 +15,6 @@ const components = {
 // Get the base URL, defaulting to "/" for development
 const baseUrl = import.meta.env.BASE_URL ?? "/";
 
-console.log("Base URL:", baseUrl);
-
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <BrowserRouter basename={baseUrl}>

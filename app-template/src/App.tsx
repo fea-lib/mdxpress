@@ -8,7 +8,6 @@ import { ThemeToggle } from "./components/ThemeToggle";
 import config from "../docs.config.json";
 
 function App() {
-  console.log("App component mounting...");
   const documents = getDocuments();
 
   // Find the best default document: README or index files first, then fallback to first document
@@ -50,29 +49,6 @@ function App() {
   const routePrefix = config.docsDir
     ? config.docsDir.split("/").filter(Boolean).pop() || "docs"
     : "docs";
-
-  console.log("App debug:", {
-    documentsCount: documents.length,
-    firstDocument: firstDocument?.title,
-    firstDocumentSlug: firstDocument?.slug,
-    configDocsDir: config.docsDir,
-    routePrefix: routePrefix,
-    selectedReason: firstDocument
-      ? firstDocument.slug
-          .split("/")
-          .pop()
-          ?.toLowerCase()
-          .replace(/\.(mdx?|md)$/, "") === "readme"
-        ? "README found"
-        : firstDocument.slug
-            .split("/")
-            .pop()
-            ?.toLowerCase()
-            .replace(/\.(mdx?|md)$/, "") === "index"
-        ? "INDEX found"
-        : "Fallback to first document"
-      : "No documents",
-  });
 
   return (
     <ThemeProvider>
