@@ -267,7 +267,9 @@ else
     DOCS_CONFIG_PATH="$DOCS_DIR"
 fi
 
-# Ensure we are in the app directory before writing config
+
+# Ensure the app directory exists before writing config
+mkdir -p "$ORIGINAL_DIR/$TARGET_DIR"
 cd "$ORIGINAL_DIR/$TARGET_DIR"
 
 cat > docs.config.json << EOF
