@@ -2,7 +2,16 @@
 
 All notable changes to MDXpress will be documented in this file.
 
-## [1.4.0] - 2025-07-21
+
+## [1.5.0] - 2025-07-22
+
+### Added
+- **Robust MDX Importing**: Now supports lazy loading of all MD/MDX files in the docs directory and subdirectories
+- **Error Isolation**: If an MDX file fails to import (e.g., due to missing components), only that document shows an error—other docs remain accessible
+- **node_modules Ignore**: All files inside any `node_modules` directory are ignored for documentation import
+
+### Changed
+- **App Template Version**: Bumped app-template version to 1.5.0
 
 ### Enhanced
 - **Default Document Selection**: Improved logic for selecting the default document on app startup
