@@ -21,13 +21,14 @@ try {
 
 export default defineConfig({
   base: process.env.NODE_ENV === "production" ? "/mdxpress/" : "/",
+  assetsInclude: ["**/*.md"],
   plugins: [
     react(),
     mdx({
       jsxImportSource: "react",
       providerImportSource: "@mdx-js/react",
       development: process.env.NODE_ENV !== "production",
-      include: /\.(mdx?|md)$/,
+      include: /\.mdx$/,
       rehypePlugins: [rehypeHighlight],
       jsxRuntime: "automatic",
     }),

@@ -1,0 +1,9 @@
+{
+  "devDependencies": {
+    "vite-plugin-markdown": "^2.2.0",
+    "vite-plugin-md": "^0.21.5"
+  },
+  "dependencies": {
+    "marked": "^16.1.1"
+  }
+}

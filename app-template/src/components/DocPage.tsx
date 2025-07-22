@@ -1,12 +1,14 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
 import { getDocumentBySlug } from "../lib/docs";
+import { marked } from "marked";
 
 interface Document {
   slug: string;
   title: string;
   path: string;
   importer: () => Promise<any>;
+  type: "mdx" | "md";
 }
 
 interface DocPageProps {
@@ -37,59 +39,111 @@ export function DocPage({ documents, routePrefix }: DocPageProps) {
     return <div>Document not found</div>;
   }
 
-  // Lazy load the MDX/MD file using the importer
-  const [Component, setComponent] = React.useState<React.ComponentType | null>(
-    null
-  );
-  const [error, setError] = React.useState<Error | null>(null);
-  const [loading, setLoading] = React.useState(true);
+  if (document.type === "mdx") {
+    // Lazy load the MDX file as a React component
+    const [Component, setComponent] =
+      React.useState<React.ComponentType | null>(null);
+    const [error, setError] = React.useState<Error | null>(null);
+    const [loading, setLoading] = React.useState(true);
 
-  React.useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    setError(null);
-    setComponent(null);
-    document
-      .importer()
-      .then((mod) => {
-        if (!cancelled) {
-          setComponent(() => mod.default);
-          setLoading(false);
-        }
-      })
-      .catch((err) => {
-        if (!cancelled) {
-          setError(err instanceof Error ? err : new Error(String(err)));
-          setLoading(false);
-        }
-      });
-    return () => {
-      cancelled = true;
-    };
-    // Only re-run when document changes
-  }, [document]);
+    React.useEffect(() => {
+      let cancelled = false;
+      setLoading(true);
+      setError(null);
+      setComponent(null);
+      document
+        .importer()
+        .then((mod) => {
+          if (!cancelled) {
+            setComponent(() => mod.default);
+            setLoading(false);
+          }
+        })
+        .catch((err) => {
+          if (!cancelled) {
+            setError(err instanceof Error ? err : new Error(String(err)));
+            setLoading(false);
+          }
+        });
+      return () => {
+        cancelled = true;
+      };
+    }, [document]);
 
-  if (loading) {
-    return <div className="doc-content">Loading...</div>;
-  }
-  if (error) {
+    if (loading) {
+      return <div className="doc-content">Loading...</div>;
+    }
+    if (error) {
+      return (
+        <div className="doc-content">
+          <h1>Error Loading Document</h1>
+          <p>Failed to load: {document.title}</p>
+          <details>
+            <summary>Error Details</summary>
+            <pre>{String(error)}</pre>
+          </details>
+        </div>
+      );
+    }
+    if (!Component) {
+      return <div className="doc-content">No content found.</div>;
+    }
     return (
       <div className="doc-content">
-        <h1>Error Loading Document</h1>
-        <p>Failed to load: {document.title}</p>
-        <details>
-          <summary>Error Details</summary>
-          <pre>{String(error)}</pre>
-        </details>
+        <Component />
       </div>
     );
+  } else {
+    // .md file: fetch raw content and render with marked
+    const [html, setHtml] = React.useState<string>("");
+    const [error, setError] = React.useState<Error | null>(null);
+    const [loading, setLoading] = React.useState(true);
+
+    React.useEffect(() => {
+      let cancelled = false;
+      setLoading(true);
+      setError(null);
+      setHtml("");
+      document
+        .importer()
+        .then((mod) => {
+          // Vite's import.meta.glob returns a module with a default export as the raw string
+          const raw = mod.default;
+          if (!cancelled) {
+            const html =
+              typeof marked.parse === "function" ? marked.parse(raw) : "";
+            setHtml(typeof html === "string" ? html : "");
+            setLoading(false);
+          }
+        })
+        .catch((err) => {
+          if (!cancelled) {
+            setError(err instanceof Error ? err : new Error(String(err)));
+            setLoading(false);
+          }
+        });
+      return () => {
+        cancelled = true;
+      };
+    }, [document]);
+
+    if (loading) {
+      return <div className="doc-content">Loading...</div>;
+    }
+    if (error) {
+      return (
+        <div className="doc-content">
+          <h1>Error Loading Document</h1>
+          <p>Failed to load: {document.title}</p>
+          <details>
+            <summary>Error Details</summary>
+            <pre>{String(error)}</pre>
+          </details>
+        </div>
+      );
+    }
+    return (
+      <div className="doc-content" dangerouslySetInnerHTML={{ __html: html }} />
+    );
   }
-  if (!Component) {
-    return <div className="doc-content">No content found.</div>;
-  }
-  return (
-    <div className="doc-content">
-      <Component />
-    </div>
-  );
 }
