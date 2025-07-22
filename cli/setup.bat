@@ -253,6 +253,7 @@ set "DOCS_CONFIG_PATH=%DOCS_CONFIG_PATH:\=/%"
 (
 echo {
 echo   "docsDir": "%DOCS_CONFIG_PATH%",
+echo   "appDir": "%TARGET_DIR%",
 echo   "title": "Interactive Documentation",  
 echo   "description": "Interactive documentation with MDX and React"
 echo }

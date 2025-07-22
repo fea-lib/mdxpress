@@ -272,6 +272,7 @@ fi
 cat > "$TARGET_DIR/docs.config.json" << EOF
 {
   "docsDir": "$DOCS_CONFIG_PATH",
+  "appDir": "$TARGET_DIR",
   "title": "Interactive Documentation",
   "description": "Interactive documentation with MDX and React"
 }
