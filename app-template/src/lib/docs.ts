@@ -1,7 +1,6 @@
 import React from "react";
 import config from "../../docs.config.json";
-import validMdxFiles from "../validMdxFiles.json";
-import { getValidMdxModules } from "../validMdxGlobs.generated";
+import { mdxModules } from "../validMdxGlobs.generated";
 
 interface Document {
   slug: string;
@@ -13,18 +12,17 @@ interface Document {
 
 // This function will be dynamically populated by the CLI
 export function getDocuments(): Document[] {
-  // Only import valid MDX files (literal array via generated function) and all MD files from the docs directory
-  const modules = {
-    ...getValidMdxModules(),
-    ...import.meta.glob(["@/docs/**/*.md"]),
-  };
+  // Use generated mdxModules object for valid MDX files
+  const mdModules = import.meta.glob(["@/docs/**/*.md"], { eager: true });
+  const modules = { ...mdxModules, ...mdModules };
+
   // Use the last segment of the configured docsDir for slug generation
   const configDocsDir =
     config.docsDir.split("/").filter(Boolean).pop() || "docs";
   const localDocsDir = "docs"; // Symlinked directory name
   const documents: Document[] = [];
 
-  for (const [path, importer] of Object.entries(modules)) {
+  for (const [path, mod] of Object.entries(modules)) {
     // Ignore any file in a node_modules directory
     if (path.includes("/node_modules/")) continue;
 
@@ -62,18 +60,11 @@ export function getDocuments(): Document[] {
     const ext = originalFileName.split(".").pop();
     const type = ext === "mdx" ? "mdx" : "md";
 
-    // For MDX files, only include if in validMdxFiles
-    if (type === "mdx") {
-      // validMdxFiles contains paths relative to docs dir, so build that
-      const relPath = pathAfterDocs.join("/");
-      if (!validMdxFiles.includes(relPath)) continue;
-    }
-
     documents.push({
       slug,
       title,
       path: `${configDocsDir}/${slug}`,
-      importer: importer as () => Promise<any>,
+      importer: typeof mod === "function" ? mod : () => Promise.resolve(mod),
       type,
     });
   }
