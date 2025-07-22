@@ -4,115 +4,117 @@
 const fs = require("fs");
 const path = require("path");
 const { createRequire } = require("module");
-const mdx = require("@mdx-js/mdx");
 
-const DOCS_DIR = path.resolve(__dirname, "../src/docs");
-const INVALID_OUTPUT_PATH = path.resolve(
-  __dirname,
-  "../src/invalidMdxFiles.json"
-);
-const requireModule = createRequire(__filename);
+(async () => {
+  const mdx = await import("@mdx-js/mdx");
 
-// Recursively find all .mdx files in docs
-function findMdxFiles(dir) {
-  let results = [];
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    const fullPath = path.join(dir, entry.name);
-    let isDir = entry.isDirectory();
-    if (entry.isSymbolicLink()) {
-      // Resolve symlink and check if target is a directory
-      try {
-        const realPath = fs.realpathSync(fullPath);
-        isDir = fs.statSync(realPath).isDirectory();
-      } catch (e) {
-        continue;
+  const DOCS_DIR = path.resolve(__dirname, "../src/docs");
+  const INVALID_OUTPUT_PATH = path.resolve(
+    __dirname,
+    "../src/invalidMdxFiles.json"
+  );
+  const requireModule = createRequire(__filename);
+
+  // Recursively find all .mdx files in docs
+  function findMdxFiles(dir) {
+    let results = [];
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const fullPath = path.join(dir, entry.name);
+      let isDir = entry.isDirectory();
+      if (entry.isSymbolicLink()) {
+        // Resolve symlink and check if target is a directory
+        try {
+          const realPath = fs.realpathSync(fullPath);
+          isDir = fs.statSync(realPath).isDirectory();
+        } catch (e) {
+          continue;
+        }
+      }
+      if (isDir) {
+        results = results.concat(findMdxFiles(fullPath));
+      } else if (entry.isFile() && entry.name.endsWith(".mdx")) {
+        results.push(fullPath);
       }
     }
-    if (isDir) {
-      results = results.concat(findMdxFiles(fullPath));
-    } else if (entry.isFile() && entry.name.endsWith(".mdx")) {
-      results.push(fullPath);
-    }
+    return results;
   }
-  return results;
-}
 
-// Extract import sources from MDX file
-function getImports(filePath) {
-  const content = fs.readFileSync(filePath, "utf8");
-  const importRegex = /import\s+[^'";]+['"]([^'"]+)['"]/g;
-  const imports = [];
-  let match;
-  while ((match = importRegex.exec(content))) {
-    imports.push(match[1]);
-  }
-  return imports;
-}
-
-// Check if all imports are resolvable and file is valid MDX
-function isValidMdx(filePath) {
-  const imports = getImports(filePath);
-  // Check all imports
-  for (const imp of imports) {
-    if (imp.startsWith(".")) {
-      // Relative import: check file exists (try .js, .jsx, .ts, .tsx, .mdx, and no extension)
-      const relPath = path.resolve(path.dirname(filePath), imp);
-      const candidates = [
-        relPath,
-        relPath + ".js",
-        relPath + ".jsx",
-        relPath + ".ts",
-        relPath + ".tsx",
-        relPath + ".mdx",
-      ];
-      if (!candidates.some(fs.existsSync)) {
-        return false;
-      }
-    } else {
-      // Dependency import: check resolvable from node_modules
-      try {
-        requireModule.resolve(imp);
-      } catch {
-        return false;
-      }
-    }
-  }
-  // Check MDX syntax
-  try {
+  // Extract import sources from MDX file
+  function getImports(filePath) {
     const content = fs.readFileSync(filePath, "utf8");
-    mdx.compileSync(content);
-  } catch (e) {
-    return false;
+    const importRegex = /import\s+[^'";]+['"]([^'"]+)['"]/g;
+    const imports = [];
+    let match;
+    while ((match = importRegex.exec(content))) {
+      imports.push(match[1]);
+    }
+    return imports;
   }
-  return true;
-}
 
-const allMdx = findMdxFiles(DOCS_DIR);
-const invalidMdx = [];
-for (const file of allMdx) {
-  if (!isValidMdx(file)) {
-    invalidMdx.push(file);
+  // Check if all imports are resolvable and file is valid MDX
+  function isValidMdx(filePath) {
+    const imports = getImports(filePath);
+    // Check all imports
+    for (const imp of imports) {
+      if (imp.startsWith(".")) {
+        // Relative import: check file exists (try .js, .jsx, .ts, .tsx, .mdx, and no extension)
+        const relPath = path.resolve(path.dirname(filePath), imp);
+        const candidates = [
+          relPath,
+          relPath + ".js",
+          relPath + ".jsx",
+          relPath + ".ts",
+          relPath + ".tsx",
+          relPath + ".mdx",
+        ];
+        if (!candidates.some(fs.existsSync)) {
+          return false;
+        }
+      } else {
+        // Dependency import: check resolvable from node_modules
+        try {
+          requireModule.resolve(imp);
+        } catch {
+          return false;
+        }
+      }
+    }
+    // Check MDX syntax
+    try {
+      const content = fs.readFileSync(filePath, "utf8");
+      mdx.compileSync(content);
+    } catch (e) {
+      return false;
+    }
+    return true;
   }
-}
-const starlightAmelcraft =
-  "/Users/tobiasbelch/fea/lib/mdxpress/app-template/src/docs/pocs/starlight/src/content/docs/amelcraft.mdx";
-invalidMdx.push(starlightAmelcraft);
 
-// Write the list of invalid MDX files (relative to docs dir)
-let relInvalidMdx = invalidMdx.map((f) => path.relative(DOCS_DIR, f));
+  const allMdx = findMdxFiles(DOCS_DIR);
+  const invalidMdx = [];
+  for (const file of allMdx) {
+    if (!isValidMdx(file)) {
+      invalidMdx.push(file);
+    }
+  }
+  const starlightAmelcraft =
+    "/Users/tobiasbelch/fea/lib/mdxpress/app-template/src/docs/pocs/starlight/src/content/docs/amelcraft.mdx";
+  invalidMdx.push(starlightAmelcraft);
 
-// Write the list of valid MDX files (relative to docs dir)
-const relValidMdx = allMdx
-  .filter((f) => !invalidMdx.includes(f))
-  .map((f) => path.relative(DOCS_DIR, f));
+  // Write the list of invalid MDX files (relative to docs dir)
+  let relInvalidMdx = invalidMdx.map((f) => path.relative(DOCS_DIR, f));
 
-// Generate validMdxGlobs.generated.ts for use with import.meta.glob
-const VALID_GLOBS_PATH = path.resolve(
-  __dirname,
-  "../src/validMdxGlobs.generated.ts"
-);
+  // Write the list of valid MDX files (relative to docs dir)
+  const relValidMdx = allMdx
+    .filter((f) => !invalidMdx.includes(f))
+    .map((f) => path.relative(DOCS_DIR, f));
 
-const globsContent = `// AUTO-GENERATED FILE. DO NOT EDIT.
+  // Generate validMdxGlobs.generated.ts for use with import.meta.glob
+  const VALID_GLOBS_PATH = path.resolve(
+    __dirname,
+    "../src/validMdxGlobs.generated.ts"
+  );
+
+  const globsContent = `// AUTO-GENERATED FILE. DO NOT EDIT.
 // Generated by scripts/filter-mdx-strict.cjs
 export function getValidMdxModules() {
   return [
@@ -120,10 +122,14 @@ export function getValidMdxModules() {
   ];
 }
 `;
-fs.writeFileSync(VALID_GLOBS_PATH, globsContent);
+  fs.writeFileSync(VALID_GLOBS_PATH, globsContent);
 
-fs.writeFileSync(INVALID_OUTPUT_PATH, JSON.stringify(relInvalidMdx, null, 2));
+  fs.writeFileSync(INVALID_OUTPUT_PATH, JSON.stringify(relInvalidMdx, null, 2));
 
-// Write the list of valid MDX files (relative to docs dir)
-const VALID_OUTPUT_PATH = path.resolve(__dirname, "../src/validMdxFiles.json");
-fs.writeFileSync(VALID_OUTPUT_PATH, JSON.stringify(relValidMdx, null, 2));
+  // Write the list of valid MDX files (relative to docs dir)
+  const VALID_OUTPUT_PATH = path.resolve(
+    __dirname,
+    "../src/validMdxFiles.json"
+  );
+  fs.writeFileSync(VALID_OUTPUT_PATH, JSON.stringify(relValidMdx, null, 2));
+})();
