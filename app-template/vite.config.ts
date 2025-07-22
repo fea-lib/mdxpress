@@ -21,7 +21,6 @@ try {
 
 export default defineConfig({
   base: process.env.NODE_ENV === "production" ? "/mdxpress/" : "/",
-  assetsInclude: ["**/*.md"],
   plugins: [
     react(),
     mdx({
@@ -33,6 +32,7 @@ export default defineConfig({
       jsxRuntime: "automatic",
     }),
   ],
+  assetsInclude: ["**/*.md"],
   server: {
     watch: {
       // Ignore app directories within the docs to prevent infinite loops

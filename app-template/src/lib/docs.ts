@@ -6,7 +6,7 @@ interface Document {
   title: string;
   path: string;
   importer: () => Promise<any>;
-  type: "mdx" | "md";
+  type: "md" | "mdx";
 }
 
 // This function will be dynamically populated by the CLI
@@ -53,8 +53,8 @@ export function getDocuments(): Document[] {
     const title =
       originalFileName || slug.split("/").pop()?.replace(/-/g, " ") || slug;
 
-    // Determine file type
-    const ext = originalFileName.split(".").pop()?.toLowerCase();
+    // Determine type from file extension
+    const ext = originalFileName.split(".").pop();
     const type = ext === "mdx" ? "mdx" : "md";
     documents.push({
       slug,
