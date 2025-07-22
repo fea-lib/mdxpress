@@ -77,11 +77,11 @@ function buildDocumentTree(documents: Document[]): TreeNode {
 function TreeNodeComponent({
   node,
   depth = 0,
-  docsDir,
+  routePrefix,
 }: {
   node: TreeNode;
   depth?: number;
-  docsDir: string;
+  routePrefix: string;
 }) {
   const [isExpanded, setIsExpanded] = useState(depth === 0 || depth === 1);
   const location = useLocation();
@@ -89,7 +89,7 @@ function TreeNodeComponent({
   // Strip the base URL from pathname for comparison
   const baseUrl = (import.meta.env.BASE_URL ?? "/").replace(/\/$/, "");
   const relativePath = location.pathname.replace(baseUrl, "");
-  const isActive = node.slug && relativePath === `/${docsDir}/${node.slug}`;
+  const isActive = node.slug && relativePath === `/${routePrefix}/${node.slug}`;
 
   const toggleExpanded = () => {
     if (hasChildren) {
@@ -114,7 +114,7 @@ function TreeNodeComponent({
           </button>
         ) : (
           // Document node - regular link
-          <Link to={`${docsDir}/${node.slug}`} className="tree-link">
+          <Link to={`/${routePrefix}/${node.slug}`} className="tree-link">
             <span className="tree-file-icon"></span>
             {node.title || node.name}
           </Link>
@@ -128,7 +128,7 @@ function TreeNodeComponent({
               key={`${child.name}-${index}`}
               node={child}
               depth={depth + 1}
-              docsDir={docsDir}
+              routePrefix={routePrefix}
             />
           ))}
         </ul>
@@ -139,6 +139,8 @@ function TreeNodeComponent({
 
 export function Navigation({ documents }: NavigationProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  // Use last segment of docsDir as routePrefix, matching App.tsx
+  const routePrefix = config.docsDir.split("/").filter(Boolean).pop() || "docs";
   const tree = buildDocumentTree(documents);
 
   // Close mobile menu when clicking outside or on a link
@@ -205,7 +207,7 @@ export function Navigation({ documents }: NavigationProps) {
                 key={`${child.name}-${index}`}
                 node={child}
                 depth={0}
-                docsDir={config.docsDir}
+                routePrefix={routePrefix}
               />
             ))}
           </ul>

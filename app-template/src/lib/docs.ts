@@ -1,4 +1,5 @@
 import React from "react";
+import config from "../../docs.config.json";
 
 interface Document {
   slug: string;
@@ -11,22 +12,21 @@ interface Document {
 export function getDocuments(): Document[] {
   // Import all MDX and MD files from the docs directory (symlinked as src/docs)
   const modules = import.meta.glob("@/docs/**/*.{md,mdx}", { eager: true });
-  const localDocsDir = "docs"; // Always use "docs" for the local symlinked directory
+  // Use the last segment of the configured docsDir for slug generation
+  const configDocsDir =
+    config.docsDir.split("/").filter(Boolean).pop() || "docs";
+  const localDocsDir = "docs"; // Symlinked directory name
   const documents: Document[] = [];
 
   for (const [path, module] of Object.entries(modules)) {
-    // Check if this file is from the configured docs directory
+    // path: e.g. '/src/docs/advanced/getting-started.mdx'
     const pathSegments = path.split("/");
     const docsDirIndex = pathSegments.findIndex(
       (segment) => segment === localDocsDir
     );
-
-    if (docsDirIndex === -1) {
-      continue;
-    }
+    if (docsDirIndex === -1) continue;
 
     // Skip any paths that contain app directories to avoid symlink loops
-    // This prevents scanning into app directories that might be within the docs
     const pathAfterDocs = pathSegments.slice(docsDirIndex + 1);
     if (
       pathAfterDocs.some(
@@ -39,13 +39,13 @@ export function getDocuments(): Document[] {
       continue;
     }
 
-    // Extract slug from path (everything after the docs directory)
-    const slugParts = pathSegments.slice(docsDirIndex + 1);
-    const slug = slugParts
+    // Slug should be relative to the configured docsDir, not the symlink name
+    // So, if config.docsDir is 'app-template/example-docs', slug is everything after that path
+    // But since we import from symlink, we use the path after localDocsDir
+    const slug = pathAfterDocs
       .join("/")
       .replace(/\.(mdx?|md)$/, "")
       .replace(/\/index$/, "");
-
     if (!slug) continue;
 
     // Extract title from the component, use original filename with extension, or slug as fallback
@@ -65,7 +65,8 @@ export function getDocuments(): Document[] {
     documents.push({
       slug,
       title,
-      path,
+      // Store the path relative to the configured docsDir for UI/routing
+      path: `${configDocsDir}/${slug}`,
       Component,
     });
   }

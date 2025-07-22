@@ -11,18 +11,21 @@ interface Document {
 
 interface DocPageProps {
   documents: Document[];
+  routePrefix: string;
 }
 
-export function DocPage({ documents }: DocPageProps) {
+export function DocPage({ documents, routePrefix }: DocPageProps) {
   const location = useLocation();
 
   // Extract slug from pathname, removing the base URL and docs directory prefix
-  // First strip the base URL, then extract the slug
   const baseUrl = (import.meta.env.BASE_URL ?? "/").replace(/\/$/, "");
   const relativePath = location.pathname.replace(baseUrl, "");
-  const pathParts = relativePath.split("/");
-  // Remove empty first element and docs directory
-  const slug = pathParts.slice(2).join("/");
+  const pathParts = relativePath.split("/").filter(Boolean);
+  // Find the index of the routePrefix in the path
+  const prefixIndex = pathParts.findIndex((part) => part === routePrefix);
+  // Slug is everything after the routePrefix
+  const slug =
+    prefixIndex !== -1 ? pathParts.slice(prefixIndex + 1).join("/") : "";
 
   if (!slug) {
     return <div>Document not found</div>;

@@ -48,7 +48,7 @@ function App() {
 
   // Derive route prefix from docsDir (use last segment or "docs" as fallback)
   const routePrefix = config.docsDir
-    ? config.docsDir.split("/").pop() || "docs"
+    ? config.docsDir.split("/").filter(Boolean).pop() || "docs"
     : "docs";
 
   console.log("App debug:", {
@@ -100,7 +100,9 @@ function App() {
             />
             <Route
               path={`/${routePrefix}/*`}
-              element={<DocPage documents={documents} />}
+              element={
+                <DocPage documents={documents} routePrefix={routePrefix} />
+              }
             />
           </Routes>
         </main>
