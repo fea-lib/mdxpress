@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "node scripts/filter-mdx-strict.cjs",
-    "predev": "node scripts/filter-mdx-strict.cjs",
+    "prebuild": "node scripts/mdx-validate.cjs",
+    "predev": "node scripts/mdx-validate.cjs",
     "build": "vite build",
     "preview": "vite preview"
   },

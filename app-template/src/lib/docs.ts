@@ -1,6 +1,5 @@
-import React from "react";
 import config from "../../docs.config.json";
-import { mdxModules } from "../validMdxGlobs.generated";
+import { mdxModules } from "../generated/validMdxGlobs.generated";
 
 interface Document {
   slug: string;

@@ -14,6 +14,7 @@ const __dirname = dirname(__filename);
 // Read the docs configuration early so we can use docsDir and appDir everywhere below
 let docsDir = "docs";
 let appDir = "app-template";
+
 try {
   const config = JSON.parse(readFileSync("./docs.config.json", "utf8"));
   docsDir = config.docsDir || "docs";
@@ -25,13 +26,12 @@ try {
 let invalidMdxFiles: string[] = [];
 try {
   invalidMdxFiles = JSON.parse(
-    readFileSync("./src/invalidMdxFiles.json", "utf8")
+    readFileSync("./src/generated/invalidMdxFiles.json", "utf8")
   );
 } catch (e) {
   console.error("Error reading invalidMdxFiles.json:", e);
 }
 
-// Compute repo root absolute invalid MDX files (for symlinked/real path matching)
 const upLevels = appDir
   .split("/")
   .filter(Boolean)

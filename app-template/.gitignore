@@ -137,3 +137,7 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Ignore all generated files except for .d.ts type declarations
+/src/generated/*
+!/src/generated/*.d.ts
