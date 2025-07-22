@@ -45,10 +45,7 @@ export function getDocuments(): Document[] {
       continue;
     }
 
-    const slug = pathAfterDocs
-      .join("/")
-      .replace(/\.(mdx?|md)$/, "")
-      .replace(/\/index$/, "");
+    const slug = pathAfterDocs.join("/").replace(/\.(mdx?|md)$/, "");
     if (!slug) continue;
 
     // Title will be loaded dynamically when the doc is loaded
