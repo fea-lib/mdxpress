@@ -269,7 +269,7 @@ else
     DOCS_CONFIG_PATH="$DOCS_DIR"
 fi
 
-cat > docs.config.json << EOF
+cat > "$TARGET_DIR/docs.config.json" << EOF
 {
   "docsDir": "$DOCS_CONFIG_PATH",
   "title": "Interactive Documentation",
@@ -277,7 +277,7 @@ cat > docs.config.json << EOF
 }
 EOF
 
-echo "   Updated docs.config.json with docsDir: $DOCS_CONFIG_PATH (repository-root relative)"
+echo "   Updated $TARGET_DIR/docs.config.json with docsDir: $DOCS_CONFIG_PATH (repository-root relative)"
 
 # Go back to original directory to handle example docs
 cd "$ORIGINAL_DIR"
