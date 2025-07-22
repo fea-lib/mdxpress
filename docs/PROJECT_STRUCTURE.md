@@ -1,14 +1,12 @@
 # 🏗️ Project Structure
 
-This document outlines the file structure of the MDXpress project.
+This document outlines the file structure and workflow of the MDXpress repository, including the app template, documentation, scripts, generated files, and symlink strategy.
 
 ## Repository Structure
 
 ```
 mdxpress/
-├── README.md                     # Main project documentation (symlink to app-template/)
-├── CHANGELOG.md                  # Project changelog (symlink to app-template/)  
-├── PROJECT_STRUCTURE.md          # This file - project structure documentation
+├── README.md                     # Main project documentation (symlink to app-template/README.md)
 ├── LICENSE                       # MIT license
 ├── .gitignore                    # Git ignore patterns
 ├── test-cli.sh                   # Test script for CLI functionality
@@ -16,6 +14,9 @@ mdxpress/
 │   └── workflows/
 │       └── deploy.yml            # GitHub Pages deployment workflow
 ├── docs/                         # Project documentation and research
+│   ├── README.md                 # Symlink to app-template/README.md
+│   ├── CHANGELOG.md              # Project changelog (symlink to app-template/CHANGELOG.md)
+│   ├── PROJECT_STRUCTURE.md          # This file - project structure documentation
 │   ├── IDEA.md                   # Project concept documentation
 │   └── pocs/                     # Proof of concepts and experiments
 │       ├── docusaurus/           # Docusaurus POC implementation
@@ -32,6 +33,8 @@ mdxpress/
 │   ├── .gitignore                # Template Git ignore patterns
 │   ├── README.md                 # Template documentation (source of truth)
 │   ├── CHANGELOG.md              # Template changelog (source of truth)
+│   ├── scripts/                  # Project scripts
+│   │   ├── mdx-validate.cjs      # Main script to validate/filter MDX files and generate artifacts
 │   ├── src/                      # Source code
 │   │   ├── main.tsx              # React app entry point
 │   │   ├── App.tsx               # Main application component
@@ -39,14 +42,13 @@ mdxpress/
 │   │   ├── vite-env.d.ts         # Vite type definitions
 │   │   ├── docs -> ../example-docs # Symlink to example documentation
 │   │   ├── components/           # React components
-│   │   │   ├── Navigation.tsx    # Navigation sidebar component
-│   │   │   ├── DocPage.tsx       # Document page renderer
-│   │   │   ├── ThemeToggle.tsx   # Dark/light theme toggle component
-│   │   │   └── CodePlayground.tsx # Interactive code execution component
 │   │   ├── contexts/             # React contexts
-│   │   │   └── ThemeContext.tsx  # Theme context provider
-│   │   └── lib/                  # Utility functions
-│   │       └── docs.ts           # Document loading utilities
+│   │   ├── lib/                  # Utility functions
+│   │   └── generated/            # Generated files for MDX filtering and imports
+│   │       ├── invalidMdxFiles.json         # List of invalid MDX files (relative paths)
+│   │       ├── validMdxFiles.json           # List of valid MDX files (relative paths)
+│   │       ├── validMdxFiles.json.d.ts      # TypeScript type declaration for validMdxFiles.json
+│   │       └── validMdxGlobs.generated.ts   # Import object for valid MDX files (used by loader)
 │   ├── example-docs/             # Example documentation content
 │   │   ├── README.md             # Documentation overview
 │   │   ├── CHANGELOG.md          # Example changelog documentation
@@ -64,91 +66,35 @@ mdxpress/
 │   └── setup.bat                 # Batch setup script (Windows)
 ```
 
-### Key Components
+## Key Workflow and Automation
 
-1. **Navigation.tsx**: Automatically generates navigation from MDX files in the docs directory
-2. **DocPage.tsx**: Renders individual documentation pages with MDX compilation
-3. **CodePlayground.tsx**: Handles interactive code execution using Sandpack
-4. **ThemeToggle.tsx**: Provides dark/light theme switching functionality
-5. **ThemeContext.tsx**: React context for managing theme state across components
+- **MDX Validation & Filtering:**
+  - `scripts/mdx-validate.cjs` scans all MDX files in `src/docs/`, validates imports and syntax, and generates artifacts in `src/generated/`.
+  - This script runs automatically before every dev/build via `predev`/`prebuild` npm scripts.
+  - Only valid MDX files are included in the build; invalid files are ignored.
+- **Symlink Strategy:**
+  - `README.md` and `CHANGELOG.md` at the repo root and in `docs/` are symlinks to the `app-template/` versions (single source of truth).
+  - `src/docs` is a symlink to `example-docs/` for development convenience.
+- **.gitignore:**
+  - All files in `src/generated/` are gitignored except for `*.d.ts` type declarations, which are kept for TypeScript support.
 
-### Configuration Files
+## Main Components & Configuration
 
+- **Navigation.tsx**: Generates navigation from MDX files in the docs directory
+- **DocPage.tsx**: Renders documentation pages with MDX compilation
+- **CodePlayground.tsx**: Interactive code execution using Sandpack
+- **ThemeToggle.tsx**: Dark/light theme switching
+- **ThemeContext.tsx**: React context for theme state
 - **docs.config.json**: Configures docs directory location and metadata
-- **vite.config.ts**: Handles MDX compilation, path aliases, and build configuration
-- **tsconfig.json**: TypeScript configuration with MDX support and path mappings
+- **vite.config.ts**: Handles MDX compilation, path aliases, and build config
+- **tsconfig.json**: TypeScript config with MDX support and path mappings
 
-### Documentation Structure
+## Development & Deployment
 
-The project uses a mixed approach for documentation organization:
-- `README.md` and `CHANGELOG.md` at root are symlinks to `app-template/` versions (source of truth)
-- `PROJECT_STRUCTURE.md` is maintained at the repository root level
-- `src/docs` symlinks to `example-docs/` for development convenience
-- This approach balances consistency with practical repository management
+- **CLI scripts** for cross-platform setup and local/remote development
+- **GitHub Actions** for CI/CD and GitHub Pages deployment
+- **SPA routing** and symlink resolution during build
 
-## CLI Features
+---
 
-### Cross-Platform Support
-- **setup.sh**: Bash script for Linux/macOS with curl/wget support
-- **setup.bat**: Batch script for Windows with PowerShell fallback
-- **Local Development Mode**: Automatically detects local vs remote execution
-- **test-cli.sh**: Automated testing script for CLI functionality
-
-### User Experience
-- Interactive prompts for project and documentation directory configuration
-- Automatic dependency detection and installation
-- Clear setup instructions with progress indicators
-- Graceful error handling with helpful error messages
-- Support for both local and remote template copying
-
-## Deployment & CI/CD
-
-### GitHub Pages Integration
-- **deploy.yml**: GitHub Actions workflow for automated deployment
-- Automatic build and deployment on push to main branch
-- Symlink resolution during build process
-- SPA routing support with 404.html fallback
-- Live demo deployment to `https://fea-lib.github.io/mdxpress`
-
-## Development Patterns
-
-### For End Users
-1. Run setup script via curl/wget or manual download
-2. Configure target directory and documentation location
-3. Install dependencies and start development server
-4. Write MDX documentation with interactive code examples
-5. Build and deploy static site to any hosting platform
-
-### For Project Maintainers
-1. Clone repository for local development
-2. Modify `app-template/` files as the source of truth
-3. Test changes using `test-cli.sh` script
-4. Update CLI scripts for new features or improvements
-5. Document changes in `app-template/CHANGELOG.md`
-
-## Extension Points
-
-The app-template is designed for full customization:
-
-- **Styling**: Modify `src/index.css` or integrate CSS frameworks
-- **Components**: Add custom React components in `src/components/`
-- **Routing**: Extend routing logic in `src/App.tsx`
-- **Build Process**: Customize `vite.config.ts` for specific needs
-- **Documentation Structure**: Organize MDX files as needed in docs directory
-- **Theming**: Extend `ThemeContext.tsx` for additional theme options
-
-## Architecture Philosophy
-
-### Zero Lock-in Approach
-Following the shadcn/ui distribution model:
-- No npm package dependency to maintain
-- Direct template copying via CLI scripts
-- Users own the complete codebase after setup
-- Zero ongoing dependencies or forced updates
-- Full customization freedom without restrictions
-
-### Symlink Strategy
-- Eliminates file duplication across the repository
-- Maintains single source of truth for documentation
-- Simplifies maintenance and reduces sync issues
-- Enables consistent documentation across all contexts
+For more details, see comments in the relevant files or ask for a specific workflow explanation.

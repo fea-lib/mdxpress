@@ -1,1 +1,1 @@
-../README.md
+../app-template/README.md
