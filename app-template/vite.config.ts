@@ -65,6 +65,7 @@ export default defineConfig({
     alias: {
       "@": resolve(__dirname, "./src"),
     },
+    preserveSymlinks: true,
   },
   optimizeDeps: {
     include: ["@mdx-js/react", "react/jsx-runtime", "react/jsx-dev-runtime"],
