@@ -256,20 +256,21 @@ if [ -d "src/docs" ]; then
     echo "   Removed existing src/docs directory"
 fi
 
+
 # Update docs configuration
 echo "⚙️  Configuring docs directory..."
 
 # Calculate the docs directory path relative to the repository root
-# The app will be in $TARGET_DIR, so we need to express DOCS_DIR relative to repo root
 if [[ "$DOCS_DIR" = /* ]]; then
-    # Absolute path - use as is (though this is not recommended for portability)
     DOCS_CONFIG_PATH="$DOCS_DIR"
 else
-    # Relative path from current directory (which is repo root when script runs)
     DOCS_CONFIG_PATH="$DOCS_DIR"
 fi
 
-cat > "$TARGET_DIR/docs.config.json" << EOF
+# Ensure we are in the app directory before writing config
+cd "$ORIGINAL_DIR/$TARGET_DIR"
+
+cat > docs.config.json << EOF
 {
   "docsDir": "$DOCS_CONFIG_PATH",
   "appDir": "$TARGET_DIR",
@@ -278,7 +279,7 @@ cat > "$TARGET_DIR/docs.config.json" << EOF
 }
 EOF
 
-echo "   Updated $TARGET_DIR/docs.config.json with docsDir: $DOCS_CONFIG_PATH (repository-root relative)"
+echo "   Updated docs.config.json with docsDir: $DOCS_CONFIG_PATH (repository-root relative)"
 
 # Go back to original directory to handle example docs
 cd "$ORIGINAL_DIR"
