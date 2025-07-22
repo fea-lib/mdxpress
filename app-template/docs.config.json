@@ -1,5 +1,6 @@
 {
   "docsDir": "docs",
+  "appDir": "app-template",
   "title": "Interactive Documentation",
   "description": "Interactive documentation with MDX and React"
 }

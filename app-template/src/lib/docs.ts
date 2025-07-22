@@ -1,5 +1,7 @@
 import React from "react";
 import config from "../../docs.config.json";
+import validMdxFiles from "../validMdxFiles.json";
+import { getValidMdxModules } from "../validMdxGlobs.generated";
 
 interface Document {
   slug: string;
@@ -11,8 +13,11 @@ interface Document {
 
 // This function will be dynamically populated by the CLI
 export function getDocuments(): Document[] {
-  // Import all MDX and MD files from the docs directory (symlinked as src/docs), lazy (not eager)
-  const modules = import.meta.glob("@/docs/**/*.{md,mdx}");
+  // Only import valid MDX files (literal array via generated function) and all MD files from the docs directory
+  const modules = {
+    ...getValidMdxModules(),
+    ...import.meta.glob(["@/docs/**/*.md"]),
+  };
   // Use the last segment of the configured docsDir for slug generation
   const configDocsDir =
     config.docsDir.split("/").filter(Boolean).pop() || "docs";
@@ -56,6 +61,14 @@ export function getDocuments(): Document[] {
     // Determine type from file extension
     const ext = originalFileName.split(".").pop();
     const type = ext === "mdx" ? "mdx" : "md";
+
+    // For MDX files, only include if in validMdxFiles
+    if (type === "mdx") {
+      // validMdxFiles contains paths relative to docs dir, so build that
+      const relPath = pathAfterDocs.join("/");
+      if (!validMdxFiles.includes(relPath)) continue;
+    }
+
     documents.push({
       slug,
       title,

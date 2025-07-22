@@ -1,23 +1,45 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import mdx from "@mdx-js/rollup";
-import { resolve } from "path";
 import { readFileSync } from "fs";
+import { resolve } from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import rehypeHighlight from "rehype-highlight";
 
+// __filename and __dirname must be declared before use
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Read the docs configuration
+// Read the docs configuration early so we can use docsDir and appDir everywhere below
 let docsDir = "docs";
+let appDir = "app-template";
 try {
   const config = JSON.parse(readFileSync("./docs.config.json", "utf8"));
   docsDir = config.docsDir || "docs";
-} catch {
-  // Use default if config doesn't exist
+  appDir = config.appDir || "app-template";
+} catch (e) {
+  console.error("Error reading docs.config.json:", e);
 }
+
+let invalidMdxFiles: string[] = [];
+try {
+  invalidMdxFiles = JSON.parse(
+    readFileSync("./src/invalidMdxFiles.json", "utf8")
+  );
+} catch (e) {
+  console.error("Error reading invalidMdxFiles.json:", e);
+}
+
+// Compute repo root absolute invalid MDX files (for symlinked/real path matching)
+const upLevels = appDir
+  .split("/")
+  .filter(Boolean)
+  .map(() => "..");
+const REPO_ROOT = resolve(__dirname, ...upLevels);
+const repoAppAbsoluteInvalidMdxFiles = invalidMdxFiles.map((rel) =>
+  resolve(REPO_ROOT, docsDir, rel)
+);
 
 export default defineConfig({
   base: process.env.NODE_ENV === "production" ? "/mdxpress/" : "/",
@@ -27,23 +49,18 @@ export default defineConfig({
       jsxImportSource: "react",
       providerImportSource: "@mdx-js/react",
       development: process.env.NODE_ENV !== "production",
-      include: /\.mdx$/,
+      // Include all MDX files in docs, filter at runtime
+      include: "**/*.mdx",
       rehypePlugins: [rehypeHighlight],
       jsxRuntime: "automatic",
     }),
   ],
-  assetsInclude: ["**/*.md"],
-  server: {
-    watch: {
-      // Ignore app directories within the docs to prevent infinite loops
-      ignored: [
-        "**/docs/**/app/**",
-        "**/docs/**/apps/**",
-        "**/docs/**/*-app/**",
-        "**/docs/**/app-*/**",
-      ],
+  build: {
+    rollupOptions: {
+      external: repoAppAbsoluteInvalidMdxFiles,
     },
   },
+  assetsInclude: ["**/*.md"],
   resolve: {
     alias: {
       "@": resolve(__dirname, "./src"),
