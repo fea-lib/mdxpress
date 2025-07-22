@@ -164,6 +164,14 @@ Deploy the `dist` folder to:
 - AWS S3
 - Any static hosting provider
 
+**Important:**
+The `base` property in your `vite.config.ts` (see:
+```js
+base: process.env.NODE_ENV === "production" ? "/mdxpress/" : "/",
+```
+) must be set to the correct base URL for your deployment target. For example, if deploying to a subpath or GitHub Pages, set it to your repository name (e.g. `"/my-repo/"`).
+
+
 ### Deploying to GitHub Pages
 
 You can automate deployment to GitHub Pages using GitHub Actions. Here is a sample workflow (`.github/workflows/deploy.yml`) that builds your app and deploys it to GitHub Pages:
@@ -241,6 +249,9 @@ This workflow will:
 - Fix any broken symlinks in `example-docs` (for demo and CI)
 - Create a `404.html` for SPA routing
 - Deploy the contents of `dist` to GitHub Pages
+
+**Note:**
+For GitHub Pages, the `base` property in your `vite.config.ts` must be set to the name of your repository (e.g. `base: "/my-repo/"`) so that all links and assets resolve correctly in production.
 
 For more details, see the [GitHub Pages documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/about-github-pages) and the [actions/deploy-pages](https://github.com/actions/deploy-pages) action.
 
