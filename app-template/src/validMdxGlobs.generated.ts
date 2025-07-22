@@ -3,6 +3,6 @@
 export function getValidMdxModules() {
   return [
     "example-docs/advanced/getting-started.mdx",
-    "example-docs/advanced/sub/examples.mdx"
+    "example-docs/advanced/sub/index.mdx"
   ];
 }
