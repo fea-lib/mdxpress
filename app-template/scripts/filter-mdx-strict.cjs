@@ -54,6 +54,29 @@ const { createRequire } = require("module");
   // Check if all imports are resolvable and file is valid MDX
   function isValidMdx(filePath) {
     const imports = getImports(filePath);
+    // Helper to check tsconfig.json extends
+    function checkTsconfigExtends(tsconfigPath) {
+      try {
+        const tsconfig = JSON.parse(fs.readFileSync(tsconfigPath, "utf8"));
+        if (typeof tsconfig.extends === "string") {
+          let base = tsconfig.extends;
+          // Try to resolve as a module or as a file
+          try {
+            requireModule.resolve(base);
+          } catch {
+            // Try as relative to tsconfig
+            const rel = path.resolve(path.dirname(tsconfigPath), base);
+            if (!fs.existsSync(rel) && !fs.existsSync(rel + ".json")) {
+              return false;
+            }
+          }
+        }
+      } catch {
+        return false;
+      }
+      return true;
+    }
+
     // Check all imports
     for (const imp of imports) {
       if (imp.startsWith(".")) {
@@ -67,8 +90,29 @@ const { createRequire } = require("module");
           relPath + ".tsx",
           relPath + ".mdx",
         ];
-        if (!candidates.some(fs.existsSync)) {
+        const found = candidates.find(fs.existsSync);
+        if (!found) {
           return false;
+        }
+        // If the import is a TS/JSX/TSX file, check tsconfig.json extends
+        if (found && /\.(ts|tsx|jsx)$/.test(found)) {
+          // Look for tsconfig.json in the same dir or parent dirs
+          let dir = path.dirname(found);
+          let tsconfigPath = null;
+          for (let i = 0; i < 5; ++i) {
+            // limit search depth
+            const candidate = path.join(dir, "tsconfig.json");
+            if (fs.existsSync(candidate)) {
+              tsconfigPath = candidate;
+              break;
+            }
+            const parent = path.dirname(dir);
+            if (parent === dir) break;
+            dir = parent;
+          }
+          if (tsconfigPath && !checkTsconfigExtends(tsconfigPath)) {
+            return false;
+          }
         }
       } else {
         // Dependency import: check resolvable from node_modules
@@ -96,9 +140,6 @@ const { createRequire } = require("module");
       invalidMdx.push(file);
     }
   }
-  const starlightAmelcraft =
-    "/Users/tobiasbelch/fea/lib/mdxpress/app-template/src/docs/pocs/starlight/src/content/docs/amelcraft.mdx";
-  invalidMdx.push(starlightAmelcraft);
 
   // Write the list of invalid MDX files (relative to docs dir)
   let relInvalidMdx = invalidMdx.map((f) => path.relative(DOCS_DIR, f));
