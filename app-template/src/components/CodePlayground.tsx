@@ -2,9 +2,6 @@ import React from "react";
 import { Sandpack } from "@codesandbox/sandpack-react";
 import { useTheme } from "../contexts/ThemeContext";
 
-// Read docsDir from docs.config.json (static import)
-import docsConfig from "../../docs.config.json";
-
 // Helper to fetch file content at runtime, with validation
 // Helper to fetch file content at runtime, resolving relative to MDX file location
 async function fetchFileContent(
@@ -12,13 +9,10 @@ async function fetchFileContent(
   mdxFilePath?: string
 ): Promise<string | undefined> {
   let cleanPath = relativePath.replace(/^\.\//, "").replace(/^\//, "");
-  const docsRoot = "/src/docs";
-  const resolvedPath = `${docsRoot}/${cleanPath}?raw`;
+  // Always fetch from public directory (root-relative)
+  const publicPath = `/${cleanPath}`;
   try {
-    let res = await fetch(resolvedPath);
-    if (!res.ok) {
-      res = await fetch(`/app-template/${cleanPath}?raw`);
-    }
+    let res = await fetch(publicPath);
     if (res.ok) {
       const text = await res.text();
       if (
