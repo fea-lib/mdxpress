@@ -11,7 +11,15 @@ All notable changes to MDXpress will be documented in this file.
 ### Fixed
 - **Asset Fetching on Custom Base Paths**: Resolved issues with file loading when the app is deployed under a non-root base path.
 
-## [1.7.1] - 2025-07-24
+
+## [1.7.3] - 2025-07-24
+
+### Changed
+- **App Template Version**: Bumped app-template version to 1.7.3
+- **Setup Script Robustness**: Improved cross-platform setup scripts (`setup.sh` and `setup.bat`) to robustly remove `src/docs` whether it is a symlink, file, or directory before copying the template. Ensures reliable updates and prevents copy errors on both Unix and Windows environments.
+
+### Fixed
+- **Symlink/Directory Handling**: Resolved edge cases where `src/docs` could block template updates due to being a symlink, file, or directory. Now always cleaned up correctly before copying.
 
 ### Changed
 - **App Template Version**: Bumped app-template version to 1.7.1

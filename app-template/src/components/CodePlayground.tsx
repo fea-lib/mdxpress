@@ -17,14 +17,6 @@ async function fetchFileContent(
     let res = await fetch(publicPath);
     if (res.ok) {
       const text = await res.text();
-      if (
-        text.trim().startsWith("<") &&
-        (text.includes("<html") ||
-          text.includes("<body") ||
-          text.includes("<!DOCTYPE"))
-      ) {
-        return undefined;
-      }
       if (text.includes("404") && text.length < 512) {
         return undefined;
       }

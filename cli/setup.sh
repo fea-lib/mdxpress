@@ -247,11 +247,12 @@ echo "🧹 Cleaning up template-specific configuration..."
 cd "$ORIGINAL_DIR/$TARGET_DIR"
 
 # Remove the existing symlink and config that point to example-docs
-if [ -L "src/docs" ]; then
-    rm "src/docs"
-    echo "   Removed existing src/docs symlink"
-fi
-if [ -d "src/docs" ]; then
+
+# Robustly remove src/docs whether it is a symlink, file, or directory
+if [ -L "src/docs" ] || [ -f "src/docs" ]; then
+    rm -f "src/docs"
+    echo "   Removed existing src/docs symlink or file"
+elif [ -d "src/docs" ]; then
     rm -rf "src/docs"
     echo "   Removed existing src/docs directory"
 fi
