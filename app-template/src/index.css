@@ -290,6 +290,10 @@ body {
   overflow: hidden;
 }
 
+.code-playground > pre {
+  margin: 0;
+}
+
 .home-page {
   text-align: center;
   padding: 4rem 2rem;

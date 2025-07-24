@@ -9,6 +9,20 @@ Welcome to your interactive documentation! This system allows you to create enga
 - **Customizable**: Full control over styling and functionality
 - **Git-Friendly**: Text-based format that works well with version control
 
+## Text
+
+<CodePlayground
+  files={{
+    "/test.txt": "example-docs/advanced/test.txt"
+  }}
+  options={{
+    showNavigator: false,
+    showTabs: false,
+    showLineNumbers: true,
+    editorHeight: 400
+  }}
+/>
+
 ## Interactive Code Example
 
 Here's a simple React component example:
@@ -16,19 +30,7 @@ Here's a simple React component example:
 <CodePlayground
   template="react-ts"
   files={{
-    "/App.tsx": `export default function App() {
-  return (
-    <div style={{ 
-      padding: '20px', 
-      textAlign: 'center',
-      backgroundColor: '#f0f8ff',
-      borderRadius: '8px'
-    }}>
-      <h1>Hello Interactive Docs! 🚀</h1>
-      <p>This code is running live in your documentation!</p>
-    </div>
-  )
-}`
+    "/App.tsx": "example-docs/advanced/HelloWorld.tsx",
   }}
   options={{
     showNavigator: false,
@@ -50,31 +52,7 @@ Here's a simple React component example:
 <CodePlayground
   template="vanilla-ts"
   files={{
-    "/index.ts": `interface User {
-  name: string
-  age: number
-  email: string
-}
-
-const users: User[] = [
-  { name: "Alice", age: 30, email: "alice@example.com" },
-  { name: "Bob", age: 25, email: "bob@example.com" }
-]
-
-function getUsersByAge(users: User[], minAge: number): User[] {
-  return users.filter(user => user.age >= minAge)
-}
-
-const adults = getUsersByAge(users, 18)
-console.log("Adults:", adults)
-
-// Output the result to the page
-document.body.innerHTML = \`
-  <h2>Users (18+)</h2>
-  <ul>
-    \${adults.map(user => \`<li>\${user.name} (\${user.age})</li>\`).join('')}
-  </ul>
-\``
+    "/index.ts": "example-docs/advanced/users.ts"
   }}
   options={{
     showNavigator: false,

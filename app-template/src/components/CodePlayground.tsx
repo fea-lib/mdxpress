@@ -2,6 +2,44 @@ import React from "react";
 import { Sandpack } from "@codesandbox/sandpack-react";
 import { useTheme } from "../contexts/ThemeContext";
 
+// Read docsDir from docs.config.json (static import)
+import docsConfig from "../../docs.config.json";
+
+// Helper to fetch file content at runtime, with validation
+// Helper to fetch file content at runtime, resolving relative to MDX file location
+async function fetchFileContent(
+  relativePath: string,
+  mdxFilePath?: string
+): Promise<string | undefined> {
+  let cleanPath = relativePath.replace(/^\.\//, "").replace(/^\//, "");
+  const docsRoot = "/src/docs";
+  const resolvedPath = `${docsRoot}/${cleanPath}?raw`;
+  try {
+    let res = await fetch(resolvedPath);
+    if (!res.ok) {
+      res = await fetch(`/app-template/${cleanPath}?raw`);
+    }
+    if (res.ok) {
+      const text = await res.text();
+      if (
+        text.trim().startsWith("<") &&
+        (text.includes("<html") ||
+          text.includes("<body") ||
+          text.includes("<!DOCTYPE"))
+      ) {
+        return undefined;
+      }
+      if (text.includes("404") && text.length < 512) {
+        return undefined;
+      }
+      return text;
+    }
+  } catch (e) {
+    // Ignore fetch errors
+  }
+  return undefined;
+}
+
 interface CodePlaygroundProps {
   children?: React.ReactNode;
   className?: string;
@@ -13,7 +51,7 @@ interface CodePlaygroundProps {
 export function CodePlayground({
   children,
   className,
-  template = "react-ts",
+  template,
   files,
   options = {},
   ...props
@@ -23,13 +61,129 @@ export function CodePlayground({
   // Determine Sandpack theme based on current theme
   const sandpackTheme = theme === "dark" ? "dark" : "light";
 
-  // If files prop is provided, use Sandpack directly (for MDX usage)
+  // If files prop is provided, support file content or relative path
+  const [resolvedFiles, setResolvedFiles] = React.useState<Record<
+    string,
+    string
+  > | null>(null);
+
+  React.useEffect(() => {
+    if (!files) return;
+    let isMounted = true;
+    const resolveAllFiles = async () => {
+      const result: Record<string, string> = {};
+      // Helper to recursively load dependencies
+
+      async function loadFileWithDeps(
+        fileName: string,
+        value: string,
+        loaded: Record<string, string>,
+        mdxFilePath?: string
+      ) {
+        // Heuristic: treat as file path if it ends with a known extension and does not contain newlines
+        const isFilePath = /^[^\n]+\.[a-zA-Z0-9]+$/.test(value.trim());
+        if (isFilePath) {
+          // Always fetch file content for file paths, relative to MDX file
+          const content = await fetchFileContent(value);
+          const code =
+            content !== undefined
+              ? content
+              : `// File not found or could not be loaded: ${value}`;
+          loaded[fileName] = code;
+          // Scan for import statements (simple regex)
+          const importRegex = /import\s+[^'"\n]+['"](.+?)['"]/g;
+          let match;
+          while ((match = importRegex.exec(code))) {
+            let depPath = match[1];
+            // Only handle relative imports
+            if (depPath.startsWith("./") || depPath.startsWith("../")) {
+              // Normalize to Sandpack file system
+              let depFileName = depPath.startsWith("./")
+                ? depPath.replace("./", "/")
+                : depPath;
+              if (!loaded[depFileName]) {
+                // Try to fetch dependency
+                const depContent = await fetchFileContent(depPath, mdxFilePath);
+                if (depContent !== undefined) {
+                  loaded[depFileName] = depContent;
+                  // Recursively load dependencies
+                  await loadFileWithDeps(
+                    depFileName,
+                    depPath,
+                    loaded,
+                    mdxFilePath
+                  );
+                }
+              }
+            }
+          }
+        } else {
+          // Direct code, do not scan for imports
+          loaded[fileName] = value;
+        }
+      }
+
+      // Try to get MDX file path from options (if provided)
+      const mdxFilePath = options?.mdxFilePath;
+      const loadedFiles: Record<string, string> = {};
+      await Promise.all(
+        Object.entries(files).map(async ([fileName, value]) => {
+          await loadFileWithDeps(fileName, value, loadedFiles, mdxFilePath);
+        })
+      );
+      if (isMounted) setResolvedFiles(loadedFiles);
+    };
+    resolveAllFiles();
+    return () => {
+      isMounted = false;
+    };
+  }, [files]);
+
   if (files) {
+    if (!resolvedFiles) {
+      // Loading state
+      return <div className="code-playground">Loading code...</div>;
+    }
+    // Detect if all files are unsupported types (e.g., .txt, .md, .json)
+    const supportedExtensions = [
+      "js",
+      "ts",
+      "tsx",
+      "jsx",
+      "html",
+      "css",
+      "json",
+    ];
+    const allUnsupported = Object.keys(resolvedFiles).every((fileName) => {
+      const ext = fileName.split(".").pop()?.toLowerCase();
+      return ext && !supportedExtensions.includes(ext);
+    });
+    if (allUnsupported) {
+      // Show raw content for the first file
+      const firstFile = Object.keys(resolvedFiles)[0];
+      return (
+        <div className="code-playground">
+          <pre
+            style={{
+              background: sandpackTheme === "dark" ? "#222" : "#f5f5f5",
+              color: sandpackTheme === "dark" ? "#eee" : "#222",
+              padding: 16,
+              borderRadius: 8,
+              overflowX: "auto",
+              minHeight: options.editorHeight || 200,
+            }}
+          >
+            {resolvedFiles[firstFile]}
+          </pre>
+        </div>
+      );
+    }
+    // Otherwise, use Sandpack as usual
     return (
       <div className="code-playground">
         <Sandpack
           template={template as any}
-          files={files}
+          files={resolvedFiles}
           options={{
             showNavigator: false,
             showTabs: true,
