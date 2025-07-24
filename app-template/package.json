@@ -1,6 +1,6 @@
 {
   "name": "@mdexpress/app-template",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "Interactive documentation with MDX and React",
   "type": "module",
   "scripts": {

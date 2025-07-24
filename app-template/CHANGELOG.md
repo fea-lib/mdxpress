@@ -2,6 +2,15 @@
 
 All notable changes to MDXpress will be documented in this file.
 
+## [1.7.1] - 2025-07-24
+
+### Changed
+- **App Template Version**: Bumped app-template version to 1.7.1
+- **Static Asset Fetching**: CodePlayground now fetches all snippet files from the public directory using root-relative URLs, ensuring compatibility with GitHub Pages and other static hosts.
+
+### Fixed
+- **404 Errors on GitHub Pages**: Resolved file loading issues by switching to public directory for all fetchable assets.
+
 ## [1.7.0] - 2025-07-24
 
 ### Added
