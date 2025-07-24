@@ -201,6 +201,17 @@ if "%LOCAL_MODE%"=="true" (
 
 echo ✅ Template ready.
 
+
+REM Delete app\src\docs before copying the app template
+if exist "%TARGET_DIR%\src\docs" (
+    echo 🧹 Removing %TARGET_DIR%\src\docs before copying template...
+    if exist "%TARGET_DIR%\src\docs\" (
+        rmdir /s /q "%TARGET_DIR%\src\docs" 2>nul
+    ) else (
+        del "%TARGET_DIR%\src\docs" 2>nul
+    )
+)
+
 REM Copy app-template to target directory
 echo 📋 Copying app-template to %TARGET_DIR%...
 REM ORIGINAL_DIR is already set above

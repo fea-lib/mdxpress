@@ -221,6 +221,13 @@ fi
 
 echo "✅ Template ready."
 
+
+# Delete app/src/docs before copying the app template
+if [ -d "$TARGET_DIR/src/docs" ] || [ -L "$TARGET_DIR/src/docs" ] || [ -f "$TARGET_DIR/src/docs" ]; then
+    echo "🧹 Removing $TARGET_DIR/src/docs before copying template..."
+    rm -rf "$TARGET_DIR/src/docs"
+fi
+
 # Copy app-template to target directory
 echo "📋 Copying app-template to $TARGET_DIR..."
 # ORIGINAL_DIR is already set above

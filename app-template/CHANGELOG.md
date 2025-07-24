@@ -1,6 +1,26 @@
 # Changelog
 
-All notable changes to MDXpress will be documented in this file.
+## [1.7.4] - 2025-07-24
+
+### Changed
+- **App Template Version**: Bumped app-template version to 1.7.4
+- **Setup Script Cleanup**: Both setup scripts (`setup.sh` and `setup.bat`) now proactively delete `app/src/docs` (or `%TARGET_DIR%\src\docs`) before copying the app template, ensuring a clean state and preventing stale symlinks, files, or directories from interfering with updates.
+
+### Fixed
+- **Pre-copy Directory Removal**: Prevents copy errors and ensures template updates work reliably even if `src/docs` exists as a symlink, file, or directory from previous runs.
+
+## [1.7.3] - 2025-07-24
+
+### Changed
+- **App Template Version**: Bumped app-template version to 1.7.3
+- **Setup Script Robustness**: Improved cross-platform setup scripts (`setup.sh` and `setup.bat`) to robustly remove `src/docs` whether it is a symlink, file, or directory before copying the template. Ensures reliable updates and prevents copy errors on both Unix and Windows environments.
+
+### Fixed
+- **Symlink/Directory Handling**: Resolved edge cases where `src/docs` could block template updates due to being a symlink, file, or directory. Now always cleaned up correctly before copying.
+
+### Changed
+- **App Template Version**: Bumped app-template version to 1.7.1
+- **Static Asset Fetching**: CodePlayground now fetches all snippet files from the public directory using root-relative URLs, ensuring compatibility with GitHub Pages and other static hosts.
 
 ## [1.7.2] - 2025-07-24
 
@@ -11,15 +31,10 @@ All notable changes to MDXpress will be documented in this file.
 ### Fixed
 - **Asset Fetching on Custom Base Paths**: Resolved issues with file loading when the app is deployed under a non-root base path.
 
-
-## [1.7.3] - 2025-07-24
-
-### Changed
-- **App Template Version**: Bumped app-template version to 1.7.3
-- **Setup Script Robustness**: Improved cross-platform setup scripts (`setup.sh` and `setup.bat`) to robustly remove `src/docs` whether it is a symlink, file, or directory before copying the template. Ensures reliable updates and prevents copy errors on both Unix and Windows environments.
-
 ### Fixed
-- **Symlink/Directory Handling**: Resolved edge cases where `src/docs` could block template updates due to being a symlink, file, or directory. Now always cleaned up correctly before copying.
+- **404 Errors on GitHub Pages**: Resolved file loading issues by switching to public directory for all fetchable assets.
+
+## [1.7.1] - 2025-07-24
 
 ### Changed
 - **App Template Version**: Bumped app-template version to 1.7.1
