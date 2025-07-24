@@ -2,6 +2,18 @@
 
 All notable changes to MDXpress will be documented in this file.
 
+## [1.7.0] - 2025-07-24
+
+### Added
+- **Raw File Support in CodePlayground**: You can now pass any file type (e.g., .txt, .md, .json) to CodePlayground. Non-code files are displayed in a styled <pre> block, while code files use Sandpack as before.
+- **Automatic File Type Detection**: CodePlayground automatically detects unsupported file types and renders them as raw text.
+
+### Improved
+- **Seamless Integration**: Sandpack integration for code files is robust; raw files display cleanly and consistently.
+
+### Changed
+- **App Template Version**: Bumped app-template version to 1.7.0
+
 ## [1.6.0] - 2025-07-22
 
 ### Added
