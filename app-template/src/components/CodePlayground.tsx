@@ -9,8 +9,10 @@ async function fetchFileContent(
   mdxFilePath?: string
 ): Promise<string | undefined> {
   let cleanPath = relativePath.replace(/^\.\//, "").replace(/^\//, "");
-  // Always fetch from public directory (root-relative)
-  const publicPath = `/${cleanPath}`;
+  // Prepend base path for static asset fetches
+  const baseUrl = import.meta.env.BASE_URL ?? "/";
+  // Ensure no double slashes
+  const publicPath = `${baseUrl.replace(/\/$/, "")}/${cleanPath}`;
   try {
     let res = await fetch(publicPath);
     if (res.ok) {

@@ -2,6 +2,15 @@
 
 All notable changes to MDXpress will be documented in this file.
 
+## [1.7.2] - 2025-07-24
+
+### Changed
+- **App Template Version**: Bumped app-template version to 1.7.2
+- **Base Path Support**: CodePlayground now prepends the configured base path (`import.meta.env.BASE_URL`) to all static asset fetches, ensuring compatibility with custom deployments and GitHub Pages.
+
+### Fixed
+- **Asset Fetching on Custom Base Paths**: Resolved issues with file loading when the app is deployed under a non-root base path.
+
 ## [1.7.1] - 2025-07-24
 
 ### Changed
