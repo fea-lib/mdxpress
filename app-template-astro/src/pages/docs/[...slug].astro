@@ -1,0 +1,30 @@
+---
+import { getCollection, render } from "astro:content";
+
+export async function getStaticPaths() {
+  const docs = await getCollection("docs");
+  return docs.map((doc) => ({
+    params: { slug: doc.id },
+    props: { doc },
+  }));
+}
+
+const { doc } = Astro.props;
+const { Content } = await render(doc);
+---
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="description" content={doc.data.title ?? doc.id} />
+    <meta name="author" content="MDXpress" />
+    <title>{doc.data.title ?? doc.id}</title>
+    <link rel="stylesheet" href="/src/styles/github-markdown.css" />
+  </head>
+  <body>
+    <h1>{doc.data.title ?? doc.id}</h1>
+    <Content />
+  </body>
+</html>

@@ -1,0 +1,150 @@
+/* GitHub Markdown Style CSS */
+
+/* Import highlight.js styles for syntax highlighting */
+@import 'highlight.js/styles/github.css';
+
+/* CSS Custom Properties - GitHub Style */
+:root {
+  --primary-color: #0969da;
+  --secondary-color: #ffffff;
+  --bg-color: #ffffff;
+  --text-color: #1f2328;
+  --text-color-secondary: #656d76;
+  --text-color-light: #656d76;
+  --border-color: #d1d9e0;
+  --hover-bg: #f3f4f6;
+  --active-color: #0969da;
+  --code-bg: #f6f8fa;
+  --pre-bg: #f6f8fa;
+  --link-color: #0969da;
+  --link-hover: #0550ae;
+}
+
+/* Dark mode variables - GitHub Dark Theme */
+[data-theme="dark"] {
+  --primary-color: #58a6ff;
+  --secondary-color: #21262d;
+  --bg-color: #0d1117;
+  --text-color: #e6edf3;
+  --text-color-secondary: #7d8590;
+  --text-color-light: #7d8590;
+  --border-color: #30363d;
+  --hover-bg: #21262d;
+  --active-color: #58a6ff;
+  --code-bg: #161b22;
+  --pre-bg: #161b22;
+  --link-color: #58a6ff;
+  --link-hover: #79c0ff;
+}
+
+/* Ensure smooth transitions between themes */
+* {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple  Color Emoji", "Segoe UI Emoji";
+  font-size: 14px;
+  color: var(--text-color);
+  line-height: 1.5;
+  background: var(--bg-color);
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Highlight.js GitHub theme (inline, for static build compatibility) */
+.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 0.5em;
+  background: #f6f8fa;
+  color: #24292f;
+}
+.hljs-comment,
+.hljs-quote {
+  color: #6a737d;
+}
+.hljs-variable,
+.hljs-template-variable,
+.hljs-attribute,
+.hljs-tag,
+.hljs-name,
+.hljs-regexp,
+.hljs-link,
+.hljs-selector-id,
+.hljs-selector-class {
+  color: #e36209;
+}
+.hljs-number,
+.hljs-meta,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params {
+  color: #005cc5;
+}
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet {
+  color: #032f62;
+}
+.hljs-title,
+.hljs-section {
+  color: #22863a;
+}
+.hljs-keyword,
+.hljs-selector-tag {
+  color: #d73a49;
+}
+.hljs {
+  background: #f6f8fa;
+}
+[data-theme="dark"] .hljs {
+  background: #161b22;
+  color: #e6edf3;
+}
+[data-theme="dark"] .hljs-comment,
+[data-theme="dark"] .hljs-quote {
+  color: #7d8590;
+}
+[data-theme="dark"] .hljs-keyword,
+[data-theme="dark"] .hljs-selector-tag {
+  color: #ff7b72;
+}
+[data-theme="dark"] .hljs-title,
+[data-theme="dark"] .hljs-section {
+  color: #d2a8ff;
+}
+[data-theme="dark"] .hljs-string,
+[data-theme="dark"] .hljs-symbol,
+[data-theme="dark"] .hljs-bullet {
+  color: #a5d6ff;
+}
+[data-theme="dark"] .hljs-variable,
+[data-theme="dark"] .hljs-template-variable,
+[data-theme="dark"] .hljs-attribute,
+[data-theme="dark"] .hljs-tag,
+[data-theme="dark"] .hljs-name,
+[data-theme="dark"] .hljs-regexp,
+[data-theme="dark"] .hljs-link,
+[data-theme="dark"] .hljs-selector-id,
+[data-theme="dark"] .hljs-selector-class {
+  color: #ffa657;
+}
+[data-theme="dark"] .hljs-number,
+[data-theme="dark"] .hljs-meta,
+[data-theme="dark"] .hljs-built_in,
+[data-theme="dark"] .hljs-builtin-name,
+[data-theme="dark"] .hljs-literal,
+[data-theme="dark"] .hljs-type,
+[data-theme="dark"] .hljs-params {
+  color: #79c0ff;
+}
