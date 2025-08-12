@@ -1,4 +1,6 @@
 ---
+import Navigation from "../../components/Navigation.astro";
+import DocPage from "../../components/DocPage.astro";
 import { getCollection, render } from "astro:content";
 
 export async function getStaticPaths() {
@@ -18,13 +20,21 @@ const { Content } = await render(doc);
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="description" content={doc.data.title ?? doc.id} />
+    <meta
+      name="description"
+      content={Astro.props.doc.data.title ?? Astro.props.doc.id}
+    />
     <meta name="author" content="MDXpress" />
-    <title>{doc.data.title ?? doc.id}</title>
+    <title>{Astro.props.doc.data.title ?? Astro.props.doc.id}</title>
     <link rel="stylesheet" href="/src/styles/github-markdown.css" />
   </head>
   <body>
-    <h1>{doc.data.title ?? doc.id}</h1>
-    <Content />
+    <div class="app">
+      <Navigation />
+      <main class="main-content">
+        <DocPage {...Astro.props} />
+      </main>
+    </div>
   </body>
-</html>
+</html>;
+

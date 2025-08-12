@@ -1,0 +1,37 @@
+---
+import NavTree from "./NavTree.astro";
+type TreeNode = {
+  name: string;
+  slug?: string;
+  title?: string;
+  children: TreeNode[];
+};
+const { nodes } = Astro.props;
+function isActive(slug: string) {
+  return Astro.url.pathname === `/docs/${slug}`
+    ? "tree-link active"
+    : "tree-link";
+}
+---
+
+<ul class="tree-children">
+  {
+    nodes.map((node) => (
+      <li class="tree-node">
+        {node.slug ? (
+          <a href={`/docs/${node.slug}`} class={isActive(node.slug)}>
+            <span class="tree-file-icon" />
+            {node.title}
+          </a>
+        ) : (
+          <span class="tree-folder-toggle" aria-expanded="true">
+            <span class="tree-toggle-icon" />
+            <span class="tree-folder-icon" />
+            <span class="tree-folder-name">{node.title}</span>
+          </span>
+        )}
+        {node.children.length > 0 ? <NavTree nodes={node.children} /> : null}
+      </li>
+    ))
+  }
+</ul>

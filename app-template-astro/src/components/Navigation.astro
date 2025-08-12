@@ -1,0 +1,61 @@
+---
+import { getCollection } from "astro:content";
+import NavTree from "./NavTree.astro";
+
+type TreeNode = {
+  name: string;
+  slug?: string;
+  title?: string;
+  children: TreeNode[];
+};
+
+const docs = await getCollection("docs");
+
+function buildTree(docs: any[]): TreeNode {
+  const root: TreeNode = { name: "root", children: [] };
+  for (const doc of docs) {
+    const parts = doc.id.split("/").filter(Boolean);
+    let node = root;
+    parts.forEach((part: string, idx: number) => {
+      let child = node.children.find((c) => c.name === part);
+      if (!child) {
+        child = {
+          name: part,
+          slug: idx === parts.length - 1 ? doc.id : undefined,
+          title:
+            idx === parts.length - 1
+              ? (doc.data.title ?? part)
+              : part.replace(/-/g, " "),
+          children: [],
+        };
+        node.children.push(child);
+      }
+      node = child;
+    });
+  }
+  function sort(node: TreeNode) {
+    node.children.sort((a, b) => {
+      const aDir = a.children.length > 0;
+      const bDir = b.children.length > 0;
+      if (aDir && !bDir) return -1;
+      if (!aDir && bDir) return 1;
+      return (a.title || a.name).localeCompare(b.title || b.name);
+    });
+    node.children.forEach(sort);
+  }
+  sort(root);
+  return root;
+}
+
+const tree = buildTree(docs);
+
+function isActive(slug: string) {
+  return Astro.url.pathname === `/docs/${slug}` ? "active" : "";
+}
+---
+
+<nav>
+  <div class="nav-content">
+    <NavTree nodes={tree.children} />
+  </div>
+</nav>
