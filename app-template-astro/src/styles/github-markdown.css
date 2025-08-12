@@ -400,7 +400,6 @@ body {
 
 .nav-content {
   display: block;
-  border-top: 1px solid var(--border-color);
   padding-top: 20px;
 }
 
