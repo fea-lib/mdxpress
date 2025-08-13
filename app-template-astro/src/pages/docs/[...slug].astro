@@ -1,4 +1,5 @@
 ---
+import MobileMenuToggle from "../../components/MobileMenuToggle.astro";
 import Navigation from "../../components/Navigation.astro";
 import ThemeToggle from "../../components/ThemeToggle.astro";
 import "../../styles/index.css";
@@ -7,13 +8,15 @@ import { getCollection, render } from "astro:content";
 export async function getStaticPaths() {
   const docs = await getCollection("docs");
 
+  const numDocs = docs.length;
+
   return docs.map((doc) => ({
     params: { slug: doc.id },
-    props: { doc },
+    props: { doc, numDocs },
   }));
 }
 
-const { doc } = Astro.props;
+const { doc, numDocs } = Astro.props;
 const { Content } = await render(doc);
 
 const title =
@@ -34,17 +37,20 @@ const title =
   </head>
   <body>
     <div class="app">
-      <Navigation />
-      <header
-        style="position:fixed;top:0;right:0;z-index:1001;padding:16px;background:none;border:none;"
-      >
+      <header class="app-actions desktop">
         <ThemeToggle />
       </header>
+      {numDocs > 1 && <Navigation />}
       <main class="main-content">
         <div class="doc-content">
           <Content />
         </div>
       </main>
+      <div class="backdrop"></div>
+      <footer class="app-actions mobile">
+        <ThemeToggle />
+        {numDocs > 1 && <MobileMenuToggle />}
+      </footer>
     </div>
   </body>
 </html>

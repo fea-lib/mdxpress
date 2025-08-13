@@ -8,8 +8,8 @@ const docs = await getCollection("docs");
 const tree = buildTree(docs);
 ---
 
-<nav>
-  <div class="nav-content">
-    <NavTree nodes={tree.children} />
-  </div>
+<nav class="navigation">
+  <h1 class="navigation-header">Docs</h1>
+  <hr />
+  <NavTree nodes={tree.children} />
 </nav>

@@ -1,6 +1,5 @@
 ---
 import type { TreeNode } from "../types/TreeNode";
-import Self from "./NavTree.astro";
 
 const { nodes } = Astro.props;
 function isActive(slug: string) {
@@ -10,7 +9,7 @@ function isActive(slug: string) {
 }
 ---
 
-<ul class="tree-children">
+<ul class="tree">
   {
     nodes.map((node: TreeNode) => (
       <li class="tree-node">
@@ -26,7 +25,7 @@ function isActive(slug: string) {
             <span class="tree-folder-name">{node.title}</span>
           </span>
         )}
-        {node.children.length > 0 ? <Self nodes={node.children} /> : null}
+        {node.children.length > 0 ? <Astro.self nodes={node.children} /> : null}
       </li>
     ))
   }
