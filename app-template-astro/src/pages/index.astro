@@ -1,16 +1,21 @@
 ---
+import { getCollection } from "astro:content";
 
+const entries = await getCollection("docs");
+const mainCandidates = ["readme", "index"];
+let mainEntry = entries.find((e) =>
+  mainCandidates.includes(e.id.toLowerCase())
+);
+
+if (!mainEntry && entries.length > 0) {
+  // Fallback: find the entry with the shortest id (closest to root)
+  mainEntry = entries.reduce((prev: any, curr: any) => {
+    return prev.id.split("/").length <= curr.id.split("/").length ? prev : curr;
+  });
+}
+
+if (mainEntry) {
+  return Astro.redirect(`/docs/${mainEntry.id}`);
+}
+// No content to render if no docs found
 ---
-
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>

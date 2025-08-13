@@ -14,18 +14,24 @@ const docs = await getCollection("docs");
 function buildTree(docs: any[]): TreeNode {
   const root: TreeNode = { name: "root", children: [] };
   for (const doc of docs) {
-    const parts = doc.id.split("/").filter(Boolean);
+    const parts = doc.filePath
+      .split("/")
+      .filter(
+        (part: string | undefined | null) =>
+          typeof part === "string" && part !== "" && part !== ".."
+      );
     let node = root;
     parts.forEach((part: string, idx: number) => {
       let child = node.children.find((c) => c.name === part);
       if (!child) {
+        let title = doc.data.title ?? part;
+
+        title = idx === parts.length - 1 ? part : part.replace(/-/g, " ");
+
         child = {
           name: part,
           slug: idx === parts.length - 1 ? doc.id : undefined,
-          title:
-            idx === parts.length - 1
-              ? (doc.data.title ?? part)
-              : part.replace(/-/g, " "),
+          title,
           children: [],
         };
         node.children.push(child);
@@ -48,10 +54,6 @@ function buildTree(docs: any[]): TreeNode {
 }
 
 const tree = buildTree(docs);
-
-function isActive(slug: string) {
-  return Astro.url.pathname === `/docs/${slug}` ? "active" : "";
-}
 ---
 
 <nav>
