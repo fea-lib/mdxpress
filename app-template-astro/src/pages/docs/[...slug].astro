@@ -1,5 +1,6 @@
 ---
 import Navigation from "../../components/Navigation.astro";
+import ThemeToggle from "../../components/ThemeToggle.astro";
 import "../../styles/index.css";
 import { getCollection, render } from "astro:content";
 
@@ -22,7 +23,7 @@ const title =
   doc.id;
 ---
 
-<html>
+<html data-theme="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -34,6 +35,11 @@ const title =
   <body>
     <div class="app">
       <Navigation />
+      <header
+        style="position:fixed;top:0;right:0;z-index:1001;padding:16px;background:none;border:none;"
+      >
+        <ThemeToggle />
+      </header>
       <main class="main-content">
         <div class="doc-content">
           <Content />
