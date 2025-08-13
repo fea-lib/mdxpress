@@ -508,6 +508,12 @@ body:has(#mobile-menu-toggle:checked) .mobile-menu-toggle-icon.opened {
   padding: 0.2em 0.5em;
 }
 
+@media (max-width: 1024px) {
+  .tree-node > *:first-child {
+    padding: 0.4em 1em;
+  }
+}
+
 .tree-link.active {
   font-weight: 600;
 }
