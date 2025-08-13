@@ -4,32 +4,50 @@
 @import "highlight.js/styles/github.css";
 
 :root {
-  /* this has to be set to switch between light or dark */
-  color-scheme: light dark;
+  /* Theme color variables: light and dark values */
+  --primary-color-light: #0969da;
+  --primary-color-dark: #58a6ff;
+  --secondary-color-light: #ffffff;
+  --secondary-color-dark: #21262d;
+  --bg-color-light: #ffffff;
+  --bg-color-dark: #0d1117;
+  --text-color-light: #1f2328;
+  --text-color-dark: #e6edf3;
+  --text-color-secondary-light: #656d76;
+  --text-color-secondary-dark: #7d8590;
+  --border-color-light: #d1d9e0;
+  --border-color-dark: #30363d;
+  --hover-bg-light: #f3f4f6;
+  --hover-bg-dark: #21262d;
+  --active-color-light: #0969da;
+  --active-color-dark: #58a6ff;
+  --code-bg-light: #f6f8fa;
+  --code-bg-dark: #161b22;
+  --pre-bg-light: #f6f8fa;
+  --pre-bg-dark: #161b22;
+  --link-color-light: #0969da;
+  --link-color-dark: #58a6ff;
+  --link-hover-light: #0550ae;
+  --link-hover-dark: #79c0ff;
+  --box-shadow-light: rgba(0, 0, 0, 0.1);
+  --box-shadow-dark: rgba(0, 0, 0, 0.3);
 
-  --primary-color: light-dark(#0969da, #58a6ff);
-  --secondary-color: light-dark(#ffffff, #21262d);
-  --bg-color: light-dark(#ffffff, #0d1117);
-  --text-color: light-dark(#1f2328, #e6edf3);
-  --text-color-secondary: light-dark(#656d76, #7d8590);
-  --text-color-light: light-dark(#656d76, #7d8590);
-  --border-color: light-dark(#d1d9e0, #30363d);
-  --hover-bg: light-dark(#f3f4f6, #21262d);
-  --active-color: light-dark(#0969da, #58a6ff);
-  --code-bg: light-dark(#f6f8fa, #161b22);
-  --pre-bg: light-dark(#f6f8fa, #161b22);
-  --link-color: light-dark(#0969da, #58a6ff);
-  --link-hover: light-dark(#0550ae, #79c0ff);
-  --box-shadow: light-dark(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.3));
-
-  --syntax-comment: light-dark(#6a737d, #8b949e);
-  --syntax-keyword: light-dark(#d73a49, #ff7b72);
-  --syntax-string: light-dark(#032f62, #a5d6ff);
-  --syntax-number: light-dark(#005cc5, #79c0ff);
-  --syntax-function: light-dark(#6f42c1, #d2a8ff);
-  --syntax-variable: light-dark(#e36209, #ffa657);
-  --syntax-tag: light-dark(#22863a, #7ee787);
-  --syntax-attribute: light-dark(#6f42c1, #d2a8ff);
+  --syntax-comment-light: #6a737d;
+  --syntax-comment-dark: #8b949e;
+  --syntax-keyword-light: #d73a49;
+  --syntax-keyword-dark: #ff7b72;
+  --syntax-string-light: #032f62;
+  --syntax-string-dark: #a5d6ff;
+  --syntax-number-light: #005cc5;
+  --syntax-number-dark: #79c0ff;
+  --syntax-function-light: #6f42c1;
+  --syntax-function-dark: #d2a8ff;
+  --syntax-variable-light: #e36209;
+  --syntax-variable-dark: #ffa657;
+  --syntax-tag-light: #22863a;
+  --syntax-tag-dark: #7ee787;
+  --syntax-attribute-light: #6f42c1;
+  --syntax-attribute-dark: #d2a8ff;
 }
 
 /* Ensure smooth transitions between themes */
@@ -61,11 +79,16 @@ body {
   min-height: 100vh;
 }
 
+/***********************
+ * DARK AND LIGHT MODE *
+ ***********************/
+
+/*   DEFAULT = LIGHT   */
 .theme-toggle {
   position: relative;
 }
 
-.theme-toggle input {
+.theme-toggle #theme-toggle {
   cursor: pointer;
   position: absolute;
   top: 0;
@@ -78,7 +101,6 @@ body {
 .theme-toggle-icon {
   opacity: 1;
   transform: scale(1);
-  transition: opacity 0.2s, transform 0.2s;
   pointer-events: auto;
   position: absolute;
   left: 50%;
@@ -86,22 +108,155 @@ body {
   translate: -50% -50%;
 }
 
-.theme-toggle-icon.light,
+:root {
+  --primary-color: var(--primary-color-light);
+  --secondary-color: var(--secondary-color-light);
+  --bg-color: var(--bg-color-light);
+  --text-color: var(--text-color-light);
+  --text-color-secondary: var(--text-color-secondary-light);
+  --border-color: var(--border-color-light);
+  --hover-bg: var(--hover-bg-light);
+  --active-color: var(--active-color-light);
+  --code-bg: var(--code-bg-light);
+  --pre-bg: var(--pre-bg-light);
+  --link-color: var(--link-color-light);
+  --link-hover: var(--link-hover-light);
+  --box-shadow: var(--box-shadow-light);
+
+  --syntax-comment: var(--syntax-comment-light);
+  --syntax-keyword: var(--syntax-keyword-light);
+  --syntax-string: var(--syntax-string-light);
+  --syntax-number: var(--syntax-number-light);
+  --syntax-function: var(--syntax-function-light);
+  --syntax-variable: var(--syntax-variable-light);
+  --syntax-tag: var(--syntax-tag-light);
+  --syntax-attribute: var(--syntax-attribute-light);
+}
+
+.theme-toggle-icon.light {
+  opacity: 1;
+  pointer-events: auto;
+  transform: scale(1);
+}
+
 .theme-toggle-icon.dark {
   opacity: 0;
   pointer-events: none;
   transform: scale(0.8);
 }
 
-.theme-toggle:has(input:not(:checked)) .theme-toggle-icon.light {
+body:has(#theme-toggle:checked) {
+  --primary-color: var(--primary-color-dark);
+  --secondary-color: var(--secondary-color-dark);
+  --bg-color: var(--bg-color-dark);
+  --text-color: var(--text-color-dark);
+  --text-color-secondary: var(--text-color-secondary-dark);
+  --border-color: var(--border-color-dark);
+  --hover-bg: var(--hover-bg-dark);
+  --active-color: var(--active-color-dark);
+  --code-bg: var(--code-bg-dark);
+  --pre-bg: var(--pre-bg-dark);
+  --link-color: var(--link-color-dark);
+  --link-hover: var(--link-hover-dark);
+  --box-shadow: var(--box-shadow-dark);
+
+  --syntax-comment: var(--syntax-comment-dark);
+  --syntax-keyword: var(--syntax-keyword-dark);
+  --syntax-string: var(--syntax-string-dark);
+  --syntax-number: var(--syntax-number-dark);
+  --syntax-function: var(--syntax-function-dark);
+  --syntax-variable: var(--syntax-variable-dark);
+  --syntax-tag: var(--syntax-tag-dark);
+  --syntax-attribute: var(--syntax-attribute-dark);
+}
+
+body:has(#theme-toggle:checked) .theme-toggle-icon.light {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.8);
+}
+
+body:has(#theme-toggle:checked) .theme-toggle-icon.dark {
   opacity: 1;
   pointer-events: auto;
   transform: scale(1);
 }
-.theme-toggle:has(input:checked) .theme-toggle-icon.dark {
-  opacity: 1;
-  pointer-events: auto;
-  transform: scale(1);
+
+/*        DARK         */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary-color: var(--primary-color-dark);
+    --secondary-color: var(--secondary-color-dark);
+    --bg-color: var(--bg-color-dark);
+    --text-color: var(--text-color-dark);
+    --text-color-secondary: var(--text-color-secondary-dark);
+    --border-color: var(--border-color-dark);
+    --hover-bg: var(--hover-bg-dark);
+    --active-color: var(--active-color-dark);
+    --code-bg: var(--code-bg-dark);
+    --pre-bg: var(--pre-bg-dark);
+    --link-color: var(--link-color-dark);
+    --link-hover: var(--link-hover-dark);
+    --box-shadow: var(--box-shadow-dark);
+
+    --syntax-comment: var(--syntax-comment-dark);
+    --syntax-keyword: var(--syntax-keyword-dark);
+    --syntax-string: var(--syntax-string-dark);
+    --syntax-number: var(--syntax-number-dark);
+    --syntax-function: var(--syntax-function-dark);
+    --syntax-variable: var(--syntax-variable-dark);
+    --syntax-tag: var(--syntax-tag-dark);
+    --syntax-attribute: var(--syntax-attribute-dark);
+  }
+
+  .theme-toggle-icon.light {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.8);
+  }
+
+  .theme-toggle-icon.dark {
+    opacity: 1;
+    pointer-events: auto;
+    transform: scale(1);
+  }
+
+  body:has(#theme-toggle:checked) {
+    --primary-color: var(--primary-color-light);
+    --secondary-color: var(--secondary-color-light);
+    --bg-color: var(--bg-color-light);
+    --text-color: var(--text-color-light);
+    --text-color-secondary: var(--text-color-secondary-light);
+    --border-color: var(--border-color-light);
+    --hover-bg: var(--hover-bg-light);
+    --active-color: var(--active-color-light);
+    --code-bg: var(--code-bg-light);
+    --pre-bg: var(--pre-bg-light);
+    --link-color: var(--link-color-light);
+    --link-hover: var(--link-hover-light);
+    --box-shadow: var(--box-shadow-light);
+
+    --syntax-comment: var(--syntax-comment-light);
+    --syntax-keyword: var(--syntax-keyword-light);
+    --syntax-string: var(--syntax-string-light);
+    --syntax-number: var(--syntax-number-light);
+    --syntax-function: var(--syntax-function-light);
+    --syntax-variable: var(--syntax-variable-light);
+    --syntax-tag: var(--syntax-tag-light);
+    --syntax-attribute: var(--syntax-attribute-light);
+  }
+
+  body:has(#theme-toggle:checked) .theme-toggle-icon.light {
+    opacity: 1;
+    pointer-events: auto;
+    transform: scale(1);
+  }
+
+  body:has(#theme-toggle:checked) .theme-toggle-icon.dark {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.8);
+  }
 }
 
 .mobile-backdrop {
