@@ -17,7 +17,8 @@ const { Content } = await render(doc);
 
 const title =
   doc.data.title ??
-  doc.rendered?.metadata?.headings?.find((h) => h.depth === 1)?.text ??
+  (Array.isArray(doc.rendered?.metadata?.headings) &&
+    doc.rendered?.metadata?.headings?.find((h) => h.depth === 1)?.text) ??
   doc.id;
 ---
 
