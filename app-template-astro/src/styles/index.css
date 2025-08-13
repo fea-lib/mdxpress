@@ -3,38 +3,33 @@
 /* Import highlight.js styles for syntax highlighting */
 @import 'highlight.js/styles/github.css';
 
-/* CSS Custom Properties - GitHub Style */
 :root {
-  --primary-color: #0969da;
-  --secondary-color: #ffffff;
-  --bg-color: #ffffff;
-  --text-color: #1f2328;
-  --text-color-secondary: #656d76;
-  --text-color-light: #656d76;
-  --border-color: #d1d9e0;
-  --hover-bg: #f3f4f6;
-  --active-color: #0969da;
-  --code-bg: #f6f8fa;
-  --pre-bg: #f6f8fa;
-  --link-color: #0969da;
-  --link-hover: #0550ae;
-}
+  /* this has to be set to switch between light or dark */
+  color-scheme: light dark;
 
-/* Dark mode variables - GitHub Dark Theme */
-[data-theme="dark"] {
-  --primary-color: #58a6ff;
-  --secondary-color: #21262d;
-  --bg-color: #0d1117;
-  --text-color: #e6edf3;
-  --text-color-secondary: #7d8590;
-  --text-color-light: #7d8590;
-  --border-color: #30363d;
-  --hover-bg: #21262d;
-  --active-color: #58a6ff;
-  --code-bg: #161b22;
-  --pre-bg: #161b22;
-  --link-color: #58a6ff;
-  --link-hover: #79c0ff;
+  --primary-color: light-dark(#0969da, #58a6ff);
+  --secondary-color: light-dark(#ffffff, #21262d);
+  --bg-color: light-dark(#ffffff, #0d1117);
+  --text-color: light-dark(#1f2328, #e6edf3);
+  --text-color-secondary: light-dark(#656d76, #7d8590);
+  --text-color-light: light-dark(#656d76, #7d8590);
+  --border-color: light-dark(#d1d9e0, #30363d);
+  --hover-bg: light-dark(#f3f4f6, #21262d);
+  --active-color: light-dark(#0969da, #58a6ff);
+  --code-bg: light-dark(#f6f8fa, #161b22);
+  --pre-bg: light-dark(#f6f8fa, #161b22);
+  --link-color: light-dark(#0969da, #58a6ff);
+  --link-hover: light-dark(#0550ae, #79c0ff);
+  --box-shadow: light-dark(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.3));
+
+  --syntax-comment: light-dark(#6a737d, #8b949e);
+  --syntax-keyword: light-dark(#d73a49, #ff7b72);
+  --syntax-string: light-dark(#032f62, #a5d6ff);
+  --syntax-number: light-dark(#005cc5, #79c0ff);
+  --syntax-function: light-dark(#6f42c1, #d2a8ff);
+  --syntax-variable: light-dark(#e36209, #ffa657);
+  --syntax-tag: light-dark(#22863a, #7ee787);
+  --syntax-attribute: light-dark(#6f42c1, #d2a8ff);
 }
 
 /* Ensure smooth transitions between themes */
@@ -355,7 +350,7 @@ body {
   transition: all 0.2s ease;
   min-width: 44px;
   height: 44px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px var(--box-shadow);
 }
 
 .unified-button:hover {
@@ -377,10 +372,6 @@ body {
 
 .unified-button:hover svg {
   transform: scale(1.1);
-}
-
-[data-theme="dark"] .unified-button {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 /* Mobile menu toggle button (burger menu) - hidden by default, only shown on tablet and smaller */
@@ -540,15 +531,6 @@ body {
   top: 20px;
   right: 20px;
   z-index: 1000;
-}
-
-/* Remove default button styles from unified buttons inside floating container */
-.floating-theme-toggle .unified-button {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-[data-theme="dark"] .floating-theme-toggle .unified-button {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 /* Mobile positioning - bottom right corner */
@@ -796,30 +778,6 @@ body {
   color: var(--text-color) !important;
   border-radius: 6px;
   font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
-}
-
-/* Light theme syntax highlighting */
-:root {
-  --syntax-comment: #6a737d;
-  --syntax-keyword: #d73a49;
-  --syntax-string: #032f62;
-  --syntax-number: #005cc5;
-  --syntax-function: #6f42c1;
-  --syntax-variable: #e36209;
-  --syntax-tag: #22863a;
-  --syntax-attribute: #6f42c1;
-}
-
-/* Dark theme syntax highlighting */
-[data-theme="dark"] {
-  --syntax-comment: #8b949e;
-  --syntax-keyword: #ff7b72;
-  --syntax-string: #a5d6ff;
-  --syntax-number: #79c0ff;
-  --syntax-function: #d2a8ff;
-  --syntax-variable: #ffa657;
-  --syntax-tag: #7ee787;
-  --syntax-attribute: #d2a8ff;
 }
 
 /* Apply syntax colors */
