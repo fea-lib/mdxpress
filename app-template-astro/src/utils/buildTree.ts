@@ -48,10 +48,13 @@ function normalize(node: TreeNode, parent?: TreeNode) {
 
   let parentForChildren = node;
 
-  if (parent && parent.name !== ROOT_NAME && parent.children.length === 1) {
+  if (parent && parent.children.length === 1) {
     parentForChildren = parent;
-    parentForChildren.name = `${parent.name}/${node.name}`;
-    parentForChildren.title = `${parent.title}/${node.title}`;
+    parentForChildren.title =
+      parent.name === ROOT_NAME ? node.title : `${parent.title}/${node.title}`;
+    parentForChildren.name =
+      parent.name === ROOT_NAME ? node.name : `${parent.name}/${node.name}`;
+    parentForChildren.slug = node.slug;
     parentForChildren.children = node.children;
   }
 

@@ -2,6 +2,7 @@
 import type { TreeNode } from "../types/TreeNode";
 
 const { nodes } = Astro.props;
+
 function isActive(slug: string) {
   return Astro.url.pathname === `/docs/${slug}`
     ? "tree-link active"

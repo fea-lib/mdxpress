@@ -27,6 +27,32 @@ describe("buildTree", () => {
     });
   });
 
+  it("replaces the root node if it only has one folder as a child", () => {
+    const docs = [
+      {
+        id: "foo/readme",
+        filePath: "foo/README.md",
+        data: { title: "Read Me" },
+      }, // minimal mock
+    ] satisfies Doc[];
+
+    const tree = buildTree(docs);
+
+    expect(tree).toStrictEqual({
+      name: "foo",
+      title: "foo",
+      slug: undefined,
+      children: [
+        {
+          name: "README.md",
+          slug: "foo/readme",
+          title: "README.md",
+          children: [],
+        },
+      ],
+    });
+  });
+
   it("creates nested nodes for nested docs", () => {
     const docs = [
       {
@@ -44,26 +70,21 @@ describe("buildTree", () => {
     const tree = buildTree(docs);
 
     expect(tree).toStrictEqual({
-      name: ROOT_NAME,
+      name: "foo",
+      slug: undefined,
+      title: "foo",
       children: [
         {
-          name: "foo",
-          slug: undefined,
-          title: "foo",
-          children: [
-            {
-              name: "bar.md",
-              slug: "foo/bar",
-              title: "bar.md",
-              children: [],
-            },
-            {
-              name: "baz.md",
-              slug: "foo/baz",
-              title: "baz.md",
-              children: [],
-            },
-          ],
+          name: "bar.md",
+          slug: "foo/bar",
+          title: "bar.md",
+          children: [],
+        },
+        {
+          name: "baz.md",
+          slug: "foo/baz",
+          title: "baz.md",
+          children: [],
         },
       ],
     });
@@ -139,33 +160,28 @@ describe("buildTree", () => {
     const tree = buildTree(docs);
 
     expect(tree).toStrictEqual({
-      name: ROOT_NAME,
+      name: "foo",
+      slug: undefined,
+      title: "foo",
       children: [
         {
-          name: "foo",
+          name: "fizz/buzz",
           slug: undefined,
-          title: "foo",
+          title: "fizz/buzz",
           children: [
             {
-              name: "fizz/buzz",
-              slug: undefined,
-              title: "fizz/buzz",
-              children: [
-                {
-                  name: "baz.md",
-                  slug: "foo/fizz/buzz/baz",
-                  title: "baz.md",
-                  children: [],
-                },
-              ],
-            },
-            {
-              name: "bar.md",
-              slug: "foo/bar",
-              title: "bar.md",
+              name: "baz.md",
+              slug: "foo/fizz/buzz/baz",
+              title: "baz.md",
               children: [],
             },
           ],
+        },
+        {
+          name: "bar.md",
+          slug: "foo/bar",
+          title: "bar.md",
+          children: [],
         },
       ],
     });

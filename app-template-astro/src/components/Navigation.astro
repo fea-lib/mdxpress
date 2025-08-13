@@ -9,7 +9,7 @@ const tree = buildTree(docs);
 ---
 
 <nav class="navigation">
-  <h1 class="navigation-header">Docs</h1>
+  <h1 class="navigation-header">{tree.name}</h1>
   <hr />
   <NavTree nodes={tree.children} />
 </nav>
