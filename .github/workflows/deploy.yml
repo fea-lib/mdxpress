@@ -32,31 +32,6 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
-      - name: Fix broken symlinks in example-docs
-        working-directory: ./app-template
-        run: |
-          echo "=== Fixing broken symlinks in example-docs ==="
-          cd example-docs
-          # Remove broken symlinks and copy files from the root repository
-          if [ -L "IDEA.md" ]; then
-            rm IDEA.md
-            cp ../../../docs/IDEA.md IDEA.md || echo "Warning: Could not copy IDEA.md"
-          fi
-          if [ -L "CHANGELOG.md" ]; then
-            rm CHANGELOG.md
-            cp ../CHANGELOG.md CHANGELOG.md
-          fi
-          if [ -L "PROJECT_STRUCTURE.md" ]; then
-            rm PROJECT_STRUCTURE.md
-            cp ../PROJECT_STRUCTURE.md PROJECT_STRUCTURE.md
-          fi
-          if [ -L "README.md" ]; then
-            rm README.md
-            cp ../README.md README.md
-          fi
-          echo "=== Verifying fixed files ==="
-          ls -la
-
       - name: Install dependencies
         working-directory: ./app-template
         run: npm install
@@ -66,12 +41,6 @@ jobs:
         run: npm run build
         env:
           NODE_ENV: production
-
-      - name: Create 404.html for GitHub Pages SPA routing
-        working-directory: ./app-template/dist
-        run: |
-          # Copy index.html to 404.html to serve the React app for any missing route
-          cp index.html 404.html
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
