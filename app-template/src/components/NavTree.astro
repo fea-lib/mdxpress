@@ -4,10 +4,11 @@ import type { TreeNode } from "../types/TreeNode";
 const { nodes } = Astro.props;
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
 function isActive(slug: string) {
-  return Astro.url.pathname === `${base}/docs/${slug}`
-    ? "tree-link active"
-    : "tree-link";
+  const pathname = `${base}/docs/${slug}${import.meta.env.PROD ? "/" : ""}`;
+
+  return Astro.url.pathname === pathname ? "tree-link active" : "tree-link";
 }
 ---
 
