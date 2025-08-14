@@ -1,0 +1,53 @@
+---
+title: Code Embedding Demo
+---
+
+import Code from "@components/Code.astro";
+
+# Code Embedding in MDX
+
+## Using Markdown
+
+```tsx
+import HelloReact from "@components/HelloReact.tsx";
+
+export default function Page() {
+  return (
+    <div>
+      <h1>Hello MDX</h1>
+      <HelloReact />
+    </div>
+  );
+}
+```
+
+## Using the Code component
+
+
+```tsx
+<Code src={{ static: {
+  "/index.html": `<!DOCTYPE html>
+  <html>
+    <head>
+      <meta charset="UTF-8" />
+    </head>
+    <body>
+      <h1>Hello World</h1>
+    </body>
+  </html>`,
+  } }}
+/>
+```
+
+<Code src={{ static: {
+  "/index.html": `<!DOCTYPE html>
+  <html>
+    <head>
+      <meta charset="UTF-8" />
+    </head>
+    <body>
+      <h1>Hello World</h1>
+    </body>
+  </html>`,
+  } }}
+/>

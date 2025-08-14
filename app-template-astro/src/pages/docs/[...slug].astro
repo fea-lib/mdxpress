@@ -17,13 +17,21 @@ export async function getStaticPaths() {
 }
 
 const { doc, numDocs } = Astro.props;
-const { Content } = await render(doc);
 
-const title =
-  doc.data.title ??
-  (Array.isArray(doc.rendered?.metadata?.headings) &&
-    doc.rendered?.metadata?.headings?.find((h) => h.depth === 1)?.text) ??
-  doc.id;
+let Content, error;
+let title = doc.data.title ?? doc.id;
+
+try {
+  const rendered = await render(doc);
+  Content = rendered.Content;
+  title =
+    doc.data.title ??
+    (Array.isArray(doc.rendered?.metadata?.headings) &&
+      doc.rendered?.metadata?.headings?.find((h) => h.depth === 1)?.text) ??
+    doc.id;
+} catch (err) {
+  error = String(err);
+}
 ---
 
 <html data-theme="dark">
@@ -43,7 +51,15 @@ const title =
       {numDocs > 1 && <Navigation />}
       <main class="main-content">
         <div class="doc-content">
-          <Content />
+          {
+            error ? (
+              <pre style="color: red; background: #222; padding: 1em; border-radius: 6px;">
+                {error}
+              </pre>
+            ) : Content ? (
+              <Content />
+            ) : null
+          }
         </div>
       </main>
       <div class="backdrop"></div>
