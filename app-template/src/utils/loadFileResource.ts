@@ -1,3 +1,5 @@
+import { pathToFileURL } from "node:url";
+import * as path from "node:path";
 import type {
   FileContent,
   FilePath,
@@ -9,10 +11,22 @@ export async function loadFileResource(
   resource: FileResource
 ): Promise<string> {
   if (isFileContent(resource)) return resource;
+
   if (isFilePath(resource)) {
+    // Remove leading slash to make it relative to project root
+
+    const relPath = resource.pathname.startsWith("/")
+      ? resource.pathname.slice(1)
+      : resource.pathname;
+    // Go up one directory from app-template to repo root
+    const repoRoot = path.resolve(process.cwd(), "..");
+    const absPath = path.resolve(repoRoot, relPath);
+    const fileUrl = pathToFileURL(absPath);
+
     const fs = await import("fs/promises");
-    return await fs.readFile(resource, "utf-8");
+    return await fs.readFile(fileUrl, "utf-8");
   }
+
   if (isRemoteUrl(resource)) {
     const res = await fetch(resource);
     return await res.text();
