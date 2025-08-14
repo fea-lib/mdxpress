@@ -35,7 +35,7 @@ export default function Code({ src, ...options }: Props) {
     <Sandpack
       theme={theme}
       files={files}
-      template={template}
+      template={template === "NULL" ? undefined : template}
       options={options}
     />
   );

@@ -1,12 +1,13 @@
+import Code from "@components/Code.astro";
+
 # Advanced Examples
 
 This page demonstrates more advanced interactive examples and features.
 
 ## React Hooks Example
 
-<CodePlayground
-  template="react-ts"
-  files={{
+<Code
+  src={{ "react-ts": {
     "/App.tsx": `
   import { useState, useEffect } from 'react'
 
@@ -83,7 +84,7 @@ This page demonstrates more advanced interactive examples and features.
       </div>
     )
   }`
-  }}
+  } }}
   options={{
     showNavigator: false,
     showTabs: false,
@@ -94,9 +95,8 @@ This page demonstrates more advanced interactive examples and features.
 
 ## Data Visualization Example
 
-<CodePlayground
-  template="vanilla-ts"
-  files={{
+<Code
+  src={{ "vanilla-ts": {
     "/index.ts": `
   interface DataPoint {
     label: string
@@ -225,6 +225,7 @@ This page demonstrates more advanced interactive examples and features.
   container.appendChild(createLegend(data))
 
   document.body.appendChild(container)`
+  }
   }}
   options={{
     showNavigator: false,
@@ -236,9 +237,8 @@ This page demonstrates more advanced interactive examples and features.
 
 ## Form Handling Example
 
-<CodePlayground
-  template="react-ts"
-  files={{
+<Code
+  src={{ "react-ts": {
     "/App.tsx": `
   import { useState } from 'react'
 
@@ -367,7 +367,7 @@ This page demonstrates more advanced interactive examples and features.
       </div>
     )
   }`
-  }}
+  } }}
   options={{
     showNavigator: false,
     showTabs: false,
@@ -375,5 +375,7 @@ This page demonstrates more advanced interactive examples and features.
     editorHeight: 700
   }}
 />
+
+---
 
 These examples show the power of combining documentation with interactive code. You can experiment with the code in real-time and see the results immediately!
