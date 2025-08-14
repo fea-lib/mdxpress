@@ -23,6 +23,9 @@ export default function Page() {
 
 ## Using the Code component
 
+Explore `app-template/src/components/Code.tsx` to see which app templates are available.
+
+### 1. Providing the content of files
 
 ```tsx
 <Code src={{ static: {
@@ -35,7 +38,7 @@ export default function Page() {
       <h1>Hello World</h1>
     </body>
   </html>`,
-  } }}
+  }}}
 />
 ```
 
@@ -49,5 +52,33 @@ export default function Page() {
       <h1>Hello World</h1>
     </body>
   </html>`,
-  } }}
+  }}}
+/>
+
+### 2. Providing a local path to load a file from
+
+```tsx
+<Code src={{ static: {
+  "/index.html": new URL("./hello-local-path.html", import.meta.url),
+  }}}
+/>
+```
+
+<Code src={{ static: {
+  "/index.html": new URL("./hello-local-path.html", import.meta.url),
+  }}}
+/>
+
+### 3. Fetch from a remote URL
+
+```tsx
+<Code src={{ static: {
+  "/index.html": new URL("https://example.com/index.html"),
+  }}}
+/>
+```
+
+<Code src={{ static: {
+  "/index.html": new URL("https://example.com/index.html"),
+  }}}
 />

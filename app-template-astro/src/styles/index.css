@@ -336,27 +336,20 @@ body:has(#theme-toggle:checked) .theme-toggle-icon.dark {
  ***********************/
 
 .app-actions {
-  display: none;
+  display: block flex;
   position: fixed;
+  bottom: 0;
+  right: 0;
   z-index: 1001;
-  padding: 16px;
+  padding: 1rem;
   flex-direction: row;
-  gap: 16px;
+  gap: 1rem;
   background: none;
   border: none;
 }
 
-@media (max-width: 1024px) {
-  .app-actions.mobile {
-    display: block flex;
-    bottom: 0;
-    right: 0;
-  }
-}
-
 @media (min-width: 1025px) {
-  .app-actions.desktop {
-    display: block flex;
+  .app-actions {
     top: 0;
     right: 0;
   }
@@ -366,6 +359,12 @@ body:has(#theme-toggle:checked) .theme-toggle-icon.dark {
 
 .mobile-menu-toggle {
   position: relative;
+}
+
+@media (min-width: 1025px) {
+  .mobile-menu-toggle {
+    display: none;
+  }
 }
 
 #mobile-menu-toggle {

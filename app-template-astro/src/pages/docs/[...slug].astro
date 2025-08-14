@@ -45,9 +45,6 @@ try {
   </head>
   <body>
     <div class="app">
-      <header class="app-actions desktop">
-        <ThemeToggle />
-      </header>
       {numDocs > 1 && <Navigation />}
       <main class="main-content">
         <div class="doc-content">
@@ -63,10 +60,10 @@ try {
         </div>
       </main>
       <div class="backdrop"></div>
-      <footer class="app-actions mobile">
+      <div class="app-actions">
         <ThemeToggle />
         {numDocs > 1 && <MobileMenuToggle />}
-      </footer>
+      </div>
     </div>
   </body>
 </html>
