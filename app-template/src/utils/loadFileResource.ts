@@ -7,6 +7,8 @@ import type {
   FileResource,
 } from "@/src/types/FileResource";
 
+const PATH_APP_TO_REPO_ROOT = "..";
+
 export async function loadFileResource(
   resource: FileResource
 ): Promise<string> {
@@ -19,7 +21,7 @@ export async function loadFileResource(
       ? resource.pathname.slice(1)
       : resource.pathname;
     // Go up one directory from app-template to repo root
-    const repoRoot = path.resolve(process.cwd(), "..");
+    const repoRoot = path.resolve(process.cwd(), PATH_APP_TO_REPO_ROOT);
     const absPath = path.resolve(repoRoot, relPath);
     const fileUrl = pathToFileURL(absPath);
 
