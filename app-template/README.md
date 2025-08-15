@@ -4,16 +4,34 @@ A copy-in CLI tool that scaffolds a customizable Vite+MDX+React documentation ap
 
 ## 🚀 Quick Start
 
-### Using curl (recommended)
+### Interactive Setup
+
+Run the setup script and follow the prompts:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/fea-lib/mdxpress/main/cli/setup.sh | bash
 ```
 
-### Using wget
+### One-liner Setup (with arguments)
+
+Skip the prompts by providing your directories directly:
 
 ```bash
+curl -fsSL https://raw.githubusercontent.com/fea-lib/mdxpress/main/cli/setup.sh | bash -s -- docs my-docs-app
+```
+
+Where:
+- `docs` is your documentation source directory
+- `my-docs-app` is where the documentation app will be created
+
+### Alternative: Using wget
+
+```bash
+# Interactive
 wget -qO- https://raw.githubusercontent.com/fea-lib/mdxpress/main/cli/setup.sh | bash
+
+# With arguments
+wget -qO- https://raw.githubusercontent.com/fea-lib/mdxpress/main/cli/setup.sh | bash -s -- docs my-docs-app
 ```
 
 ### Manual Download
@@ -22,7 +40,25 @@ Download and run the setup script for your platform:
 
 - **Linux/macOS**: [setup.sh](https://raw.githubusercontent.com/fea-lib/mdxpress/main/cli/setup.sh)
 
+```bash
+# Interactive mode
+./setup.sh
+
+# With arguments
+./setup.sh docs my-docs-app
+
+# Show help
+./setup.sh --help
+```
+
 ➡️ See [Usage](#️-usage) and [Troubleshooting](#️-troubleshooting) for next steps and help.
+
+### 💡 Pro Tips
+
+- **For CI/CD pipelines**: Use the argument version for automated setups
+- **First-time users**: Use interactive mode to understand the options
+- **Team onboarding**: Share the one-liner with arguments for consistent setup
+- **Multiple projects**: Arguments make it easy to script different configurations
 
 ## 🎯 Perfect For
 
@@ -103,18 +139,25 @@ your-docs-app/          # Configurable via CLI
 ## 🛠️ Usage
 
 1. **Run the setup script** (see Quick Start above)
-2. **Configure your setup** when prompted:
-   - Target directory for the docs app
-   - Source directory for your documentation files
-3. **Install dependencies**:
+   - Use interactive mode for guidance: `curl -s URL | bash`
+   - Use direct arguments for automation: `curl -s URL | bash -s -- docs my-docs-app`
+
+2. **Install dependencies**:
    ```bash
    cd your-docs-app
    npm install
    ```
-4. **Start developing**:
+
+3. **Start developing**:
    ```bash
    npm run dev
    ```
+
+### Setup Options
+
+- **Interactive mode**: Script will prompt for directories
+- **Direct arguments**: `./setup.sh [docs_dir] [target_dir]`
+- **Help**: `./setup.sh --help` shows all usage options
 
 ### Common Issues
 

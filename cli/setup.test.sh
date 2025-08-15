@@ -2,6 +2,9 @@
 
 set -e
 
+# Test suite for setup.sh using curl to simulate real remote execution
+# This tests the actual user experience of running: curl -s URL | bash -s -- args
+
 # Helper: clean and create a directory
 function reset_dir() {
   local dir="$1"
@@ -11,15 +14,16 @@ function reset_dir() {
   mkdir -p "$dir"
 }
 
-# Helper: run setup.sh with simulated input
+# Helper: run setup.sh with command-line arguments via curl (simulates remote execution)
 function run_setup() {
   local workdir="$1"
   local docs_dir="$2"
   local target_dir="$3"
+  # Get the absolute path to the setup script from the current working directory
+  local script_path="$(pwd)/cli/setup.sh"
   (
     cd "$workdir"
-    # Simulate interactive input for setup.sh
-    printf "%s\n%s\nY\n" "$docs_dir" "$target_dir" | bash ../../cli/setup.sh
+    curl -s "file://$script_path" | bash -s -- "$docs_dir" "$target_dir"
   )
 }
 

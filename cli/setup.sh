@@ -5,9 +5,40 @@
 
 set -e
 
+# Default values
+DEFAULT_DOCS_DIR="docs"
+DEFAULT_TARGET_DIR="docs-app"
+
+# Ensure we're in a valid working directory
+if ! pwd &> /dev/null; then
+    cd /tmp 2>/dev/null || cd ~ 2>/dev/null || {
+        echo "❌ Error: Cannot establish a valid working directory"
+        exit 1
+    }
+fi
+
 echo "🚀 Interactive Documentation Setup"
 echo "=================================="
 echo ""
+
+# Show usage if help is requested
+if [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
+    echo "Usage:"
+    echo "  ./setup.sh [docs_dir] [target_dir]"
+    echo ""
+    echo "Arguments:"
+    echo "  docs_dir   Source directory containing your documentation (default: $DEFAULT_DOCS_DIR)"
+    echo "  target_dir Target directory for the documentation app (default: $DEFAULT_TARGET_DIR)"
+    echo ""
+    echo "Examples:"
+    echo "  ./setup.sh                    # Interactive mode with prompts"
+    echo "  ./setup.sh docs apps/docs     # Use specific directories"
+    echo ""
+    echo "Remote usage:"
+    echo "  curl -s URL/setup.sh | bash -s -- docs apps/docs"
+    echo ""
+    exit 0
+fi
 
 # Check if curl is available
 if ! command -v curl &> /dev/null; then
@@ -45,25 +76,36 @@ if ! command -v npm &> /dev/null; then
     exit 1
 fi
 
+# Ensure we're in a valid directory before running npm
+if ! pwd &> /dev/null; then
+    cd /tmp || cd ~ || exit 1
+fi
+
 NPM_VERSION=$(npm --version)
 echo "✅ npm version $NPM_VERSION detected"
 
-# Default values
-DEFAULT_TARGET_DIR="docs-app"
-DEFAULT_DOCS_DIR="docs"
 REPO_URL="https://github.com/fea-lib/mdxpress/archive/refs/heads/main.tar.gz"
 
 # Check if we're running locally (for development)
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# When run via curl | bash, BASH_SOURCE[0] will be empty or not a real file path
+SCRIPT_SOURCE="${BASH_SOURCE[0]}"
 
-# Always use absolute path for TEMPLATE_PATH
-if [ -f "$SCRIPT_DIR/../app-template/package.json" ]; then
-    LOCAL_MODE=true
-    TEMPLATE_PATH="$(cd "$SCRIPT_DIR/../app-template" && pwd)"
-    echo "🔧 Running in local development mode"
-else
+if [ -z "$SCRIPT_SOURCE" ] || [[ "$SCRIPT_SOURCE" == "bash" ]] || [[ "$SCRIPT_SOURCE" == "-bash" ]] || [[ "$SCRIPT_SOURCE" == "/dev/fd/"* ]]; then
+    # Script is being piped (curl | bash), force remote mode
     LOCAL_MODE=false
     echo "🌐 Running in remote mode"
+else
+    # Script is running from a file, check if it's local development
+    SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_SOURCE")" 2>/dev/null && pwd)" || SCRIPT_DIR=""
+    
+    if [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/../app-template/package.json" ]; then
+        LOCAL_MODE=true
+        TEMPLATE_PATH="$(cd "$SCRIPT_DIR/../app-template" && pwd)"
+        echo "🔧 Running in local development mode"
+    else
+        LOCAL_MODE=false
+        echo "🌐 Running in remote mode"
+    fi
 fi
 
 echo "This script will set up an interactive documentation app in your project."
@@ -72,12 +114,30 @@ echo ""
 
 
 
-# Always prompt for input, regardless of how the script is executed
-read -p "📚 Enter your docs source directory [$DEFAULT_DOCS_DIR]: " DOCS_DIR
-DOCS_DIR=${DOCS_DIR:-$DEFAULT_DOCS_DIR}
+# Check if arguments were provided
+if [ $# -ge 2 ]; then
+    # Use command-line arguments
+    DOCS_DIR="$1"
+    TARGET_DIR="$2"
+    echo "📚 Using docs directory: $DOCS_DIR"
+    echo "📁 Using target directory: $TARGET_DIR"
+else
+    # Prompt for input interactively
+    read -p "📚 Enter your docs source directory [$DEFAULT_DOCS_DIR]: " DOCS_DIR
+    DOCS_DIR=${DOCS_DIR:-$DEFAULT_DOCS_DIR}
+    
+    read -p "📁 Enter the target directory [$DEFAULT_TARGET_DIR]: " TARGET_DIR
+    TARGET_DIR=${TARGET_DIR:-$DEFAULT_TARGET_DIR}
+fi
 
-read -p "📁 Enter the target directory [$DEFAULT_TARGET_DIR]: " TARGET_DIR
-TARGET_DIR=${TARGET_DIR:-$DEFAULT_TARGET_DIR}
+# Ensure docs directory exists
+if [ ! -d "$DOCS_DIR" ]; then
+    echo "📁 Creating docs directory: $DOCS_DIR"
+    mkdir -p "$DOCS_DIR"
+    echo "✅ Created docs directory"
+else
+    echo "✅ Docs directory already exists: $DOCS_DIR"
+fi
 
 # Create parent directories for target directory if needed
 mkdir -p "$(dirname "$TARGET_DIR")"
