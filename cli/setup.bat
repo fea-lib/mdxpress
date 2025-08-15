@@ -4,29 +4,35 @@ setlocal EnableDelayedExpansion
 REM Interactive Documentation Setup Script
 REM Inspired by shadcn/ui approach
 
-echo 🚀 Interactive Documentation Setup
-echo ==================================
-echo.
 
-REM Check if curl is available
+@echo off
+setlocal EnableDelayedExpansion
+
+REM Interactive Documentation Setup Script (Windows)
+REM Mirrors setup.sh logic for Windows
+
+REM ========== 1. Prerequisite Checks ==========
+    set /p confirm=
+    if /i not "!confirm!"=="y" if /i not "!confirm!"=="yes" (
+        echo Setup cancelled.
+
+REM Check for curl
 curl --version >nul 2>&1
 if %errorlevel% neq 0 (
     echo ❌ Error: curl is required but not installed.
-    echo Please install curl and try again.
     pause
     exit /b 1
 )
 
-REM Check if tar is available
-tar --version >nul 2>&1
+REM Check for tar
+where tar >nul 2>&1
 if %errorlevel% neq 0 (
     echo ❌ Error: tar is required but not installed.
-    echo Please install tar and try again.
     pause
     exit /b 1
 )
 
-REM Check Node.js version
+REM Check for node
 node --version >nul 2>&1
 if %errorlevel% neq 0 (
     echo ❌ Error: Node.js is required but not installed.
@@ -34,12 +40,9 @@ if %errorlevel% neq 0 (
     pause
     exit /b 1
 )
-
 for /f "tokens=*" %%i in ('node --version') do set NODE_VERSION=%%i
 set NODE_VERSION=%NODE_VERSION:v=%
 echo ✅ Node.js version %NODE_VERSION% detected
-
-REM Simple version check - extract major version number
 for /f "tokens=1 delims=." %%a in ("%NODE_VERSION%") do set NODE_MAJOR=%%a
 if %NODE_MAJOR% lss 18 (
     echo ❌ Error: Node.js %NODE_VERSION% is too old. Version 18.0.0 or higher is required.
@@ -48,62 +51,32 @@ if %NODE_MAJOR% lss 18 (
     exit /b 1
 )
 
-REM Check npm version
+REM Check for npm
 npm --version >nul 2>&1
 if %errorlevel% neq 0 (
     echo ❌ Error: npm is required but not installed.
     pause
     exit /b 1
 )
-
 for /f "tokens=*" %%i in ('npm --version') do set NPM_VERSION=%%i
 echo ✅ npm version %NPM_VERSION% detected
 
-REM Default values
+        pause
+REM ========== 2. Prompt for Directories ==========
 set DEFAULT_TARGET_DIR=docs-app
 set DEFAULT_DOCS_DIR=docs
 set REPO_URL=https://github.com/fea-lib/mdxpress/archive/refs/heads/main.tar.gz
 
-REM Check if we're running locally (for development)
-set SCRIPT_DIR=%~dp0
-if exist "%SCRIPT_DIR%..\app-template\package.json" (
-    set LOCAL_MODE=true
-    set TEMPLATE_PATH=%SCRIPT_DIR%..\app-template
-    echo 🔧 Running in local development mode
-) else (
-    set LOCAL_MODE=false
-    echo 🌐 Running in remote mode
-)
+REM Prompt for docs dir
+set /p DOCS_DIR=📚 Enter your docs source directory [%DEFAULT_DOCS_DIR%]: 
+if "%DOCS_DIR%"=="" set DOCS_DIR=%DEFAULT_DOCS_DIR%
 
-echo This script will set up an interactive documentation app in your project.
-echo Working directory: %CD%
-echo.
+REM Prompt for target dir
+set /p TARGET_DIR=📁 Enter the target directory [%DEFAULT_TARGET_DIR%]: 
+if "%TARGET_DIR%"=="" set TARGET_DIR=%DEFAULT_TARGET_DIR%
 
-REM Prompt for docs directory first
-echo 📚 Enter your docs source directory [%DEFAULT_DOCS_DIR%]:
-set /p DOCS_DIR=
-if "%DOCS_DIR%"=="" (
-    set DOCS_DIR=%DEFAULT_DOCS_DIR%
-    echo    Using default: %DEFAULT_DOCS_DIR%
-)
-
-REM Prompt for target directory
-echo 📁 Enter the target directory [%DEFAULT_TARGET_DIR%]:
-set /p TARGET_DIR=
-if "%TARGET_DIR%"=="" (
-    set TARGET_DIR=%DEFAULT_TARGET_DIR%
-    echo    Using default: %DEFAULT_TARGET_DIR%
-)
-
-REM Check if target directory already exists
-if exist "%TARGET_DIR%" (
-    echo.
-    echo ⚠️  Directory '%TARGET_DIR%' already exists.
-    echo Do you want to continue? This may overwrite existing files (y/N):
-    set /p confirm=
-    if /i not "!confirm!"=="y" if /i not "!confirm!"=="yes" (
-        echo Setup cancelled.
-        pause
+REM Create parent directories for target dir if needed
+if not exist "%TARGET_DIR%" mkdir "%TARGET_DIR%"
         exit /b 0
     )
     echo Continuing...

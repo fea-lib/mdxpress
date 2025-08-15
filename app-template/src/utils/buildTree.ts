@@ -1,3 +1,4 @@
+import { DOCS_DIR } from "../environment";
 import type { Doc } from "../types/Doc";
 import type { TreeNode } from "../types/TreeNode";
 
@@ -39,6 +40,11 @@ export function buildTree(docs: Doc[]): TreeNode {
   normalize(root);
   sort(root);
 
+  if (root.name === ROOT_NAME) {
+    root.name = DOCS_DIR;
+    root.title = DOCS_DIR;
+  }
+
   return root;
 }
 
@@ -50,6 +56,7 @@ function normalize(node: TreeNode, parent?: TreeNode) {
 
   if (parent && parent.children.length === 1) {
     parentForChildren = parent;
+
     parentForChildren.title =
       parent.name === ROOT_NAME ? node.title : `${parent.title}/${node.title}`;
     parentForChildren.name =

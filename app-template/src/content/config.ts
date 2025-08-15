@@ -4,7 +4,13 @@ import { DOCS_DIR, PATH_APP_TO_REPO_ROOT } from "@/src/environment";
 
 const docs = defineCollection({
   loader: glob({
-    pattern: "**/*.{md,mdx}",
+    pattern: [
+      "**/*.{md,mdx}",
+      "!**/node_modules/**/*",
+      "!**/dist/**/*",
+      "!**/src/**/*",
+      "!**/.astro/**/*",
+    ],
     base: `${PATH_APP_TO_REPO_ROOT}/${DOCS_DIR}`,
   }),
   schema: z.object({
