@@ -21,7 +21,6 @@ wget -qO- https://raw.githubusercontent.com/fea-lib/mdxpress/main/cli/setup.sh |
 Download and run the setup script for your platform:
 
 - **Linux/macOS**: [setup.sh](https://raw.githubusercontent.com/fea-lib/mdxpress/main/cli/setup.sh)
-- **Windows**: [setup.bat](https://raw.githubusercontent.com/fea-lib/mdxpress/main/cli/setup.bat)
 
 ➡️ See [Usage](#️-usage) and [Troubleshooting](#️-troubleshooting) for next steps and help.
 
@@ -82,6 +81,25 @@ your-docs-app/                # Configurable via CLI
 ├── public/                   # Static assets
 ```
 
+```
+your-docs-app/          # Configurable via CLI
+├── package.json        # Dependencies and scripts
+├── astro.config.mjs    # Astro configuration with MDX support
+├── tsconfig.json       # TypeScript configuration
+├── .gitignore          # Template Git ignore patterns
+├── example-docs/       # Example documentation
+├── public/             # Static assets (served as-is)
+├── src/                # Main Astro application source code
+│   ├── components/     # Astro and React components (for interactive/MDX code)
+│   ├── content/        # Astro configuration from where to gather the documents
+│   ├── pages/          # Astro page routes (including dynamic docs routing)
+│   ├── styles/         # Global and component CSS
+│   ├── types/          # All globally used types
+│   ├── utils/          # All globally used utilities
+│   └── environment.ts  # Path constants derived from the CLI input
+└── tests/              # Unit tests
+```
+
 ## 🛠️ Usage
 
 1. **Run the setup script** (see Quick Start above)
@@ -113,19 +131,12 @@ Create `.mdx` files in your docs directory:
 
 Here's an interactive React example using the CodePlayground component:
 
-<CodePlayground
-  template="react-ts"
-  files={{
+<Code
+  src={{ "react-ts": {
     "/App.tsx": `export default function App() {
       return <h1>Hello Interactive Docs!</h1>
     }`
-  }}
-  options={{
-    showNavigator: false,
-    showTabs: false,
-    showLineNumbers: true,
-    editorHeight: 300
-  }}
+  } }}
 />
 ```
 
@@ -143,11 +154,11 @@ The setup creates a seamless connection between your existing docs and the inter
 
 Since you own the code, you can customize everything:
 
-- **Styling**: Edit `src/index.css` or add your own CSS
+- **Styling**: Edit `src/styles/index.css` or add your own CSS
 - **Components**: Create custom components in `src/components/`
-- **Layout**: Modify `src/App.tsx` and navigation
-- **Build process**: Update `vite.config.ts`
-- **Routes**: Add new routes in `src/App.tsx`
+- **Layout**: Modify `src/pages/docs/[...slug].astro` and navigation
+- **Build process**: Update `astro.config.mjs`
+- **Routes**: Add new file-based routes in `src/pages`
 
 ## 🚢 Deployment
 
@@ -165,7 +176,7 @@ Deploy the `dist` folder to:
 - Any static hosting provider
 
 **Important:**
-The `base` property in your `vite.config.ts` (see:
+The `base` property in your `astro.config.mjs` (see:
 ```js
 base: process.env.NODE_ENV === "production" ? "/mdxpress/" : "/",
 ```
@@ -221,12 +232,6 @@ jobs:
         env:
           NODE_ENV: production
 
-      - name: Create 404.html for GitHub Pages SPA routing
-        working-directory: ./app-template/dist
-        run: |
-          # Copy index.html to 404.html to serve the React app for any missing route
-          cp index.html 404.html
-
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
@@ -246,12 +251,10 @@ jobs:
 
 This workflow will:
 - Build your app in the `app-template` directory
-- Fix any broken symlinks in `example-docs` (for demo and CI)
-- Create a `404.html` for SPA routing
 - Deploy the contents of `dist` to GitHub Pages
 
 **Note:**
-For GitHub Pages, the `base` property in your `vite.config.ts` must be set to the name of your repository (e.g. `base: "/my-repo/"`) so that all links and assets resolve correctly in production.
+For GitHub Pages, the `base` property in your `astro.config.mjs` must be set to the name of your repository (e.g. `base: "/my-repo/"`) so that all links and assets resolve correctly in production.
 
 For more details, see the [GitHub Pages documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/about-github-pages) and the [actions/deploy-pages](https://github.com/actions/deploy-pages) action.
 

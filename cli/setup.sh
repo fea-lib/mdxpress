@@ -71,11 +71,11 @@ echo "Working directory: $(pwd)"
 echo ""
 
 
-# Prompt for docs directory (always read from stdin for automation compatibility)
+
+# Always prompt for input, regardless of how the script is executed
 read -p "📚 Enter your docs source directory [$DEFAULT_DOCS_DIR]: " DOCS_DIR
 DOCS_DIR=${DOCS_DIR:-$DEFAULT_DOCS_DIR}
 
-# Prompt for target directory (always read from stdin for automation compatibility)
 read -p "📁 Enter the target directory [$DEFAULT_TARGET_DIR]: " TARGET_DIR
 TARGET_DIR=${TARGET_DIR:-$DEFAULT_TARGET_DIR}
 
@@ -102,6 +102,38 @@ if [ "$LOCAL_MODE" = true ]; then
             }
         }
     fi
+else
+    # Remote mode: download and extract template
+    echo "📦 Downloading app-template..."
+    TEMP_DIR=$(mktemp -d)
+    cd "$TEMP_DIR"
+    
+    curl -L "$REPO_URL" -o app-template.tar.gz || {
+        echo "❌ Error downloading app-template."
+        exit 1
+    }
+    
+    tar -xzf app-template.tar.gz --strip-components=1 || {
+        echo "❌ Error extracting app-template."
+        exit 1
+    }
+    
+    cd - > /dev/null
+    
+    # Copy app-template to target directory
+    echo "🔄 Copying app-template to $TARGET_DIR..."
+    if [ -d "$TEMP_DIR/app-template" ]; then
+        cp -r "$TEMP_DIR/app-template"/* "$TARGET_DIR/" || {
+            echo "❌ Error copying app-template to target directory."
+            exit 1
+        }
+    else
+        echo "❌ Error: Template directory not found in download."
+        exit 1
+    fi
+    
+    # Cleanup
+    rm -rf "$TEMP_DIR"
 fi
 
 # Always write src/environment.ts with correct values
@@ -126,9 +158,17 @@ export const DOCS_DIR = "$DOCS_DIR";
 EOF
 
 echo ""
+echo "🎉 Setup complete!"
+echo ""
+echo "📁 Your interactive documentation app is ready in: $TARGET_DIR"
+echo "   Absolute path: $(pwd)/$TARGET_DIR"
+echo "📚 Your docs will be loaded from: $DOCS_DIR"
+echo "   Absolute path: $(pwd)/$DOCS_DIR"
+echo ""
+echo "🚀 Next steps:"
+echo ""
 echo "1. Navigate to your app directory:"
 echo "   cd $TARGET_DIR"
-echo "   (or: cd \"$(realpath "$ORIGINAL_DIR/$TARGET_DIR" 2>/dev/null || echo "$ORIGINAL_DIR/$TARGET_DIR")\")"
 echo ""
 echo "2. Install dependencies:"
 echo "   npm install"
