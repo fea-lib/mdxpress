@@ -6,8 +6,7 @@ import type {
   RemoteUrl,
   FileResource,
 } from "@/src/types/FileResource";
-
-const PATH_APP_TO_REPO_ROOT = "..";
+import { PATH_APP_TO_REPO_ROOT } from "@/src/environment";
 
 export async function loadFileResource(
   resource: FileResource
